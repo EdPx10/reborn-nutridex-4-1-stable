@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -52,6 +53,32 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				nutri: {
+					green: '#34A853',
+					light: '#F6FBF8',
+					blue: '#4285F4',
+					red: '#EA4335',
+					yellow: '#FBBC05',
+					orange: '#FF9800',
+					purple: '#9C27B0'
+				},
+				category: {
+					fruit: '#FFE7E5',
+					legume: '#E4F4E8',
+					poisson: '#D6EDF9',
+					viande: '#F9E8E8',
+					cereales: '#FFF2D6',
+					noix: '#F4E8DB',
+					legumineuse: '#E8E4F9'
+				},
+				benefit: {
+					antioxydant: '#4285F4',
+					antiInflammatoire: '#9C27B0',
+					santeIntestinale: '#34A853',
+					santeCardiac: '#EA4335',
+					santeCerebrale: '#673AB7',
+					immunitaire: '#FF9800'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -84,11 +111,22 @@ export default {
 					to: {
 						height: '0'
 					}
-				}
+				},
+				'fade-in': {
+					'0%': {
+						opacity: '0',
+						transform: 'translateY(10px)'
+					},
+					'100%': {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
+				},
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fade-in 0.3s ease-out',
 			}
 		}
 	},
