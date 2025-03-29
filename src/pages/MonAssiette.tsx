@@ -1,32 +1,22 @@
 
 import React, { useState, useEffect } from 'react';
-import { Search, Trash2, Check, ChevronDown, ChevronUp } from 'lucide-react';
+import { Search, Trash2 } from 'lucide-react';
 import { getFoodById } from '@/data/foods';
 import { Food } from '@/types';
-import { foodCategories } from '@/data/healthBenefits';
-import { NutrientBadge } from '@/components/ui/NutrientBadge';
-import { ProgressBar } from '@/components/ui/ProgressBar';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ConsumedFoodItem from '@/components/mon-assiette/ConsumedFoodItem';
+import MacronutrientTab from '@/components/mon-assiette/MacronutrientTab';
+import MicronutrientTab from '@/components/mon-assiette/MicronutrientTab';
 
 interface ConsumedFood {
   food: Food;
   quantity: number;
 }
 
-interface SubLipids {
-  saturated: number;
-  monoUnsaturated: number;
-  polyUnsaturated: number;
-  omega3: number;
-  omega6: number;
-}
-
 const MonAssiette: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [consumedFoods, setConsumedFoods] = useState<ConsumedFood[]>([]);
-  const [lipidsExpanded, setLipidsExpanded] = useState(false);
-  const [polyUnsaturatedExpanded, setPolyUnsaturatedExpanded] = useState(false);
   const { activeProfile } = useUserProfile();
   
   // Charger les aliments depuis localStorage
@@ -200,327 +190,24 @@ const MonAssiette: React.FC = () => {
                   <TabsTrigger value="micronutriments" className="flex-1">Micronutriments</TabsTrigger>
                 </TabsList>
                 
-                <TabsContent value="macronutriments" className="space-y-6">
-                  <NutrientProgress
-                    label="Glucides"
-                    current={totalNutrients.glucides}
-                    goal={activeProfile.goals.glucides.goal}
-                    unit="g"
-                    color="bg-nutri-blue"
-                  />
-                  <NutrientProgress
-                    label="Protéines"
-                    current={totalNutrients.proteines}
-                    goal={activeProfile.goals.proteines.goal}
-                    unit="g"
-                    color="bg-nutri-red"
-                  />
-                  
-                  <div className="border-t border-b border-gray-100 py-2">
-                    <button 
-                      className="flex justify-between items-center w-full py-2 text-left font-medium"
-                      onClick={() => setLipidsExpanded(!lipidsExpanded)}
-                    >
-                      <span>Lipides</span>
-                      {lipidsExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-                    </button>
-                    
-                    {lipidsExpanded && (
-                      <div className="pt-2 pb-3 space-y-6">
-                        <NutrientProgress
-                          label="Lipides (Total)"
-                          current={totalNutrients.lipides}
-                          goal={activeProfile.goals.lipides.goal}
-                          unit="g"
-                          color="bg-nutri-yellow"
-                          indent={false}
-                        />
-                        
-                        <NutrientProgress
-                          label="Acides gras saturés"
-                          current={totalNutrients.lipids.saturated}
-                          goal={activeProfile.goals.lipides.goal * 0.33} // Approximation
-                          unit="g"
-                          color="bg-nutri-yellow"
-                          indent={true}
-                        />
-                        
-                        <NutrientProgress
-                          label="Acides gras mono-insaturés"
-                          current={totalNutrients.lipids.monoUnsaturated}
-                          goal={activeProfile.goals.lipides.goal * 0.33} // Approximation
-                          unit="g"
-                          color="bg-nutri-yellow"
-                          indent={true}
-                        />
-                        
-                        <div className="border-t border-b border-gray-50 py-2 ml-6">
-                          <button 
-                            className="flex justify-between items-center w-full py-2 text-left"
-                            onClick={() => setPolyUnsaturatedExpanded(!polyUnsaturatedExpanded)}
-                          >
-                            <span>Acides gras poly-insaturés</span>
-                            {polyUnsaturatedExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                          </button>
-                          
-                          {polyUnsaturatedExpanded ? (
-                            <div className="pt-2 pb-3 space-y-6">
-                              <NutrientProgress
-                                label="Acides gras poly-insaturés (Total)"
-                                current={totalNutrients.lipids.polyUnsaturated}
-                                goal={activeProfile.goals.lipides.goal * 0.33} // Approximation
-                                unit="g"
-                                color="bg-nutri-yellow"
-                                indent={true}
-                              />
-                              
-                              <NutrientProgress
-                                label="Oméga-3"
-                                current={totalNutrients.lipids.omega3}
-                                goal={2} // Recommandation générale
-                                unit="g"
-                                color="bg-nutri-yellow"
-                                indent={true}
-                              />
-                              
-                              <NutrientProgress
-                                label="Oméga-6"
-                                current={totalNutrients.lipids.omega6}
-                                goal={10} // Recommandation générale
-                                unit="g"
-                                color="bg-nutri-yellow"
-                                indent={true}
-                              />
-                            </div>
-                          ) : null}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <NutrientProgress
-                    label="Fibres"
-                    current={totalNutrients.fibres}
-                    goal={activeProfile.goals.fibres.goal}
-                    unit="g"
-                    color="bg-nutri-green"
+                <TabsContent value="macronutriments">
+                  <MacronutrientTab 
+                    totalNutrients={totalNutrients} 
+                    activeProfile={activeProfile} 
                   />
                 </TabsContent>
                 
-                <TabsContent value="micronutriments" className="space-y-4">
-                  <Accordion title="Vitamines" defaultOpen={true}>
-                    <div className="space-y-6 pt-2">
-                      {Object.entries(totalNutrients.vitamines).map(([key, value]) => {
-                        const vitaminGoal = activeProfile.goals.vitamines[key];
-                        if (!vitaminGoal) return null;
-                        
-                        return (
-                          <MicroNutrientProgress
-                            key={key}
-                            label={`Vitamine ${key.toUpperCase()}`}
-                            current={value}
-                            goal={vitaminGoal.goal}
-                            unit={vitaminGoal.unit}
-                          />
-                        );
-                      })}
-                    </div>
-                  </Accordion>
-                  
-                  <Accordion title="Minéraux">
-                    <div className="space-y-6 pt-2">
-                      {Object.entries(totalNutrients.mineraux).map(([key, value]) => {
-                        const mineralGoal = activeProfile.goals.mineraux[key];
-                        if (!mineralGoal) return null;
-                        
-                        return (
-                          <MicroNutrientProgress
-                            key={key}
-                            label={key.charAt(0).toUpperCase() + key.slice(1)}
-                            current={value}
-                            goal={mineralGoal.goal}
-                            unit={mineralGoal.unit}
-                          />
-                        );
-                      })}
-                    </div>
-                  </Accordion>
+                <TabsContent value="micronutriments">
+                  <MicronutrientTab
+                    totalNutrients={totalNutrients}
+                    activeProfile={activeProfile}
+                  />
                 </TabsContent>
               </Tabs>
             </div>
           )}
         </div>
       </div>
-    </div>
-  );
-};
-
-interface ConsumedFoodItemProps {
-  item: ConsumedFood;
-  onRemove: () => void;
-}
-
-const ConsumedFoodItem: React.FC<ConsumedFoodItemProps> = ({ item, onRemove }) => {
-  const { food, quantity } = item;
-  const categoryInfo = foodCategories.find(c => c.id === food.category);
-  
-  return (
-    <div className="bg-white rounded-lg border border-gray-100 p-4 flex items-center gap-3">
-      {food.image ? (
-        <img 
-          src={food.image} 
-          alt={food.name} 
-          className="w-16 h-16 rounded-md object-cover"
-        />
-      ) : (
-        <div className={`w-16 h-16 rounded-md flex items-center justify-center ${categoryInfo?.color || 'bg-gray-100'}`}>
-          {food.name.charAt(0)}
-        </div>
-      )}
-      
-      <div className="flex-grow">
-        <div className="flex justify-between items-start">
-          <div>
-            <h3 className="font-medium">{food.name}</h3>
-            <span className={`text-xs px-2 py-0.5 rounded-full ${categoryInfo?.color || 'bg-gray-100'}`}>
-              {categoryInfo?.name || food.category}
-            </span>
-          </div>
-          <button onClick={onRemove} className="p-1 text-gray-400 hover:text-red-500">
-            <Trash2 size={16} />
-          </button>
-        </div>
-        
-        <div className="flex flex-wrap gap-1 mt-2">
-          {food.healthBenefits.slice(0, 2).map((benefit) => (
-            <NutrientBadge 
-              key={benefit} 
-              type={benefit} 
-              showName={false} 
-            />
-          ))}
-          {food.healthBenefits.length > 2 && (
-            <span className="text-xs px-1.5 py-0.5 rounded-full bg-gray-100">
-              +{food.healthBenefits.length - 2}
-            </span>
-          )}
-        </div>
-      </div>
-      
-      <div className="text-right">
-        <div className="font-medium">
-          {quantity}{food.portion.unit}
-        </div>
-        <div className="text-sm text-gray-500 mt-1">
-          <Check size={12} className="inline-block text-nutri-green" />
-        </div>
-      </div>
-    </div>
-  );
-};
-
-interface NutrientProgressProps {
-  label: string;
-  current: number;
-  goal: number;
-  unit: string;
-  color: string;
-  indent?: boolean;
-}
-
-const NutrientProgress: React.FC<NutrientProgressProps> = ({ 
-  label, 
-  current, 
-  goal, 
-  unit, 
-  color,
-  indent = false
-}) => {
-  const percentage = Math.round((current / goal) * 100);
-  
-  return (
-    <div className={indent ? "ml-6" : ""}>
-      <div className="flex justify-between items-center mb-1">
-        <span className="font-medium">{label}</span>
-        <span>
-          {current.toFixed(1)}/{goal} {unit}
-        </span>
-      </div>
-      <ProgressBar 
-        value={current} 
-        max={goal} 
-        color={color}
-        height="h-3"
-      />
-      <div className="text-right text-sm text-gray-500 mt-1">
-        {percentage}% {goal > current ? `(Recommandation: ${goal} ${unit})` : '(Objectif atteint)'}
-      </div>
-    </div>
-  );
-};
-
-interface MicroNutrientProgressProps {
-  label: string;
-  current: number;
-  goal: number;
-  unit: string;
-}
-
-const MicroNutrientProgress: React.FC<MicroNutrientProgressProps> = ({ 
-  label, 
-  current, 
-  goal, 
-  unit
-}) => {
-  const percentage = Math.round((current / goal) * 100);
-  
-  return (
-    <div>
-      <div className="flex justify-between items-center mb-1">
-        <span>{label}</span>
-        <span className="text-sm text-gray-600">
-          {current.toFixed(1)} / {goal} {unit}
-        </span>
-      </div>
-      
-      <ProgressBar 
-        value={current} 
-        max={goal} 
-        color="bg-nutri-orange"
-        height="h-2"
-      />
-      
-      <div className="text-right mt-1 text-sm text-gray-500">
-        {percentage}% de l'objectif
-      </div>
-    </div>
-  );
-};
-
-interface AccordionProps {
-  title: string;
-  children: React.ReactNode;
-  defaultOpen?: boolean;
-}
-
-const Accordion: React.FC<AccordionProps> = ({ title, children, defaultOpen = false }) => {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
-  
-  return (
-    <div className="border-t border-b border-gray-100 py-2">
-      <button 
-        className="flex justify-between items-center w-full py-2 text-left"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <span className="font-medium">{title}</span>
-        {isOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-      </button>
-      
-      {isOpen && (
-        <div className="pt-2 pb-3">
-          {children}
-        </div>
-      )}
     </div>
   );
 };
