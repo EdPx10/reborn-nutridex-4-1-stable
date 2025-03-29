@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, UtensilsCrossed, List, User, Search } from 'lucide-react';
+import { Home, UtensilsCrossed, User, Search } from 'lucide-react';
 
 const Header: React.FC = () => {
   const location = useLocation();
@@ -25,9 +25,6 @@ const Header: React.FC = () => {
             <NavLink to="/mon-assiette" active={isActive('/mon-assiette')} icon={<UtensilsCrossed size={18} />}>
               Mon assiette
             </NavLink>
-            <NavLink to="/aliments" active={isActive('/aliments')} icon={<List size={18} />}>
-              Tous les aliments
-            </NavLink>
             <NavLink to="/profil" active={isActive('/profil')} icon={<User size={18} />}>
               Profil
             </NavLink>
@@ -41,10 +38,9 @@ const Header: React.FC = () => {
       
       {/* Navigation mobile */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-10">
-        <div className="grid grid-cols-4 h-16">
+        <div className="grid grid-cols-3 h-16">
           <NavButton to="/" active={isActive('/')} icon={<Home size={20} />} label="Explorateur" />
           <NavButton to="/mon-assiette" active={isActive('/mon-assiette')} icon={<UtensilsCrossed size={20} />} label="Assiette" />
-          <NavButton to="/aliments" active={isActive('/aliments')} icon={<List size={20} />} label="Aliments" />
           <NavButton to="/profil" active={isActive('/profil')} icon={<User size={20} />} label="Profil" />
         </div>
       </nav>

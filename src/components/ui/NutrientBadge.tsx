@@ -24,8 +24,8 @@ export const NutrientBadge: React.FC<NutrientBadgeProps> = ({
   const { name, icon: Icon, color } = benefit;
   
   return (
-    <span className={cn(`inline-flex items-center gap-1 text-xs rounded-full px-2 py-1 font-medium ${color}`, className)}>
-      {showIcon && <Icon size={14} className="shrink-0" />}
+    <span className={cn(`inline-flex items-center gap-2 text-xs rounded-full px-3 py-1.5 font-medium ${color}`, className)}>
+      {showIcon && <Icon size={16} className="shrink-0" />}
       {showName && <span className="whitespace-nowrap">{name}</span>}
     </span>
   );
