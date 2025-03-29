@@ -114,22 +114,75 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                   icon="🥩"
                   goal={profile.goals.proteines}
                 />
+                
+                <div className="pt-2">
+                  <Accordion title="Lipides">
+                    <MacroNutrient
+                      label="Lipides (Total)"
+                      icon="🧈"
+                      goal={profile.goals.lipides}
+                      showIcon={false}
+                    />
+                    
+                    <div className="space-y-6 mt-6">
+                      <MacroNutrient
+                        label="Acides gras saturés"
+                        goal={profile.goals.lipides}
+                        subGoalPercentage={0.33}
+                        showIcon={false}
+                        indent={true}
+                      />
+                      
+                      <MacroNutrient
+                        label="Acides gras mono-insaturés"
+                        goal={profile.goals.lipides}
+                        subGoalPercentage={0.33}
+                        showIcon={false}
+                        indent={true}
+                      />
+                      
+                      <Accordion title="Acides gras poly-insaturés" nestedAccordion={true}>
+                        <MacroNutrient
+                          label="Acides gras poly-insaturés (Total)"
+                          goal={profile.goals.lipides}
+                          subGoalPercentage={0.33}
+                          showIcon={false}
+                          indent={true}
+                        />
+                        
+                        <div className="space-y-6 mt-6">
+                          <MacroNutrient
+                            label="Oméga-3"
+                            goal={{
+                              current: profile.goals.lipides.current * 0.05,
+                              goal: 2,
+                              unit: 'g'
+                            }}
+                            showIcon={false}
+                            indent={true}
+                          />
+                          
+                          <MacroNutrient
+                            label="Oméga-6"
+                            goal={{
+                              current: profile.goals.lipides.current * 0.1,
+                              goal: 10,
+                              unit: 'g'
+                            }}
+                            showIcon={false}
+                            indent={true}
+                          />
+                        </div>
+                      </Accordion>
+                    </div>
+                  </Accordion>
+                </div>
+                
                 <MacroNutrient
                   label="Fibres"
                   icon="🥬"
                   goal={profile.goals.fibres}
                 />
-                
-                <div className="pt-2">
-                  <Accordion title="Lipides">
-                    <MacroNutrient
-                      label="Lipides"
-                      icon="🧈"
-                      goal={profile.goals.lipides}
-                      showIcon={false}
-                    />
-                  </Accordion>
-                </div>
               </div>
             )}
             
@@ -199,37 +252,47 @@ interface MacroNutrientProps {
   icon?: string;
   goal: NutrientGoal;
   showIcon?: boolean;
+  indent?: boolean;
+  subGoalPercentage?: number;
 }
 
 const MacroNutrient: React.FC<MacroNutrientProps> = ({ 
   label, 
   icon, 
   goal,
-  showIcon = true
+  showIcon = true,
+  indent = false,
+  subGoalPercentage
 }) => {
-  const percentage = Math.round((goal.current / goal.goal) * 100);
+  const adjustedGoal = subGoalPercentage ? {
+    ...goal,
+    current: goal.current * subGoalPercentage,
+    goal: goal.goal * subGoalPercentage
+  } : goal;
+  
+  const percentage = Math.round((adjustedGoal.current / adjustedGoal.goal) * 100);
   
   return (
-    <div>
+    <div className={indent ? "ml-6" : ""}>
       <div className="flex items-center gap-2 mb-1">
         {showIcon && icon && <span className="text-xl">{icon}</span>}
         <span className="font-medium">{label}</span>
       </div>
       
       <ProgressBar 
-        value={goal.current} 
-        max={goal.goal}
+        value={adjustedGoal.current} 
+        max={adjustedGoal.goal}
         height="h-2.5"
-        color={label === 'Glucides' ? 'bg-nutri-blue' : 
-               label === 'Protéines' ? 'bg-nutri-red' : 
-               label === 'Fibres' ? 'bg-nutri-green' : 'bg-nutri-yellow'}
+        color={label.includes('Lipides') || label.includes('gras') || label.includes('Oméga') ? 'bg-nutri-yellow' : 
+               label.includes('Glucides') ? 'bg-nutri-blue' : 
+               label.includes('Protéines') ? 'bg-nutri-red' : 'bg-nutri-green'}
       />
       
       <div className="flex justify-between mt-1 text-sm text-gray-600">
         <div>{percentage}% de l'objectif</div>
         <div>
-          {goal.current} / {goal.goal} {goal.unit} 
-          {goal.recommended && ` (recommandé: ${goal.recommended} ${goal.unit})`}
+          {adjustedGoal.current} / {adjustedGoal.goal} {adjustedGoal.unit} 
+          {adjustedGoal.recommended && ` (recommandé: ${adjustedGoal.recommended} ${adjustedGoal.unit})`}
         </div>
       </div>
     </div>
@@ -271,19 +334,20 @@ interface AccordionProps {
   title: string;
   children: React.ReactNode;
   defaultOpen?: boolean;
+  nestedAccordion?: boolean;
 }
 
-const Accordion: React.FC<AccordionProps> = ({ title, children, defaultOpen = false }) => {
+const Accordion: React.FC<AccordionProps> = ({ title, children, defaultOpen = false, nestedAccordion = false }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   
   return (
-    <div className="border-t border-b border-gray-100 py-2">
+    <div className={`border-t border-b ${nestedAccordion ? 'border-gray-50 ml-6' : 'border-gray-100'} py-2`}>
       <button 
         className="flex justify-between items-center w-full py-2 text-left"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span className="font-medium">{title}</span>
-        {isOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+        <span className={`${nestedAccordion ? '' : 'font-medium'}`}>{title}</span>
+        {isOpen ? <ChevronUp size={nestedAccordion ? 16 : 18} /> : <ChevronDown size={nestedAccordion ? 16 : 18} />}
       </button>
       
       {isOpen && (

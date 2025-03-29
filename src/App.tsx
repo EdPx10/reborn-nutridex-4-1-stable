@@ -25,7 +25,7 @@ const App = () => (
             <Route path="/aliment/:id" element={<FicheAliment />} />
             <Route path="/mon-assiette" element={<MonAssiette />} />
             <Route path="/profil" element={<ProfilUtilisateur />} />
-            <Route path="/aliments" element={<Explorateur />} /> {/* Temporairement redirige vers Explorateur */}
+            <Route path="/aliments" element={<Explorateur />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </MainLayout>

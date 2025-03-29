@@ -9,6 +9,13 @@ export interface Food {
     proteines: number;
     lipides: number;
     fibres?: number;
+    lipids?: {
+      saturated: number;
+      monoUnsaturated: number;
+      polyUnsaturated: number;
+      omega3: number;
+      omega6: number;
+    };
     vitamines?: {
       [key: string]: number;
     };
