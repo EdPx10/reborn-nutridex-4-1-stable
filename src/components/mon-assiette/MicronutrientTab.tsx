@@ -2,7 +2,7 @@
 import React from 'react';
 import Accordion from './Accordion';
 import MicroNutrientProgress from './MicroNutrientProgress';
-import getNutrientIcon from '@/components/ui/NutrientIcons';
+import { getNutrientIcon } from '@/components/ui/NutrientIcons';
 
 interface MicronutrientTabProps {
   totalNutrients: {

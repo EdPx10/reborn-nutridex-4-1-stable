@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import NutrientProgress from './NutrientProgress';
-import getNutrientIcon from '@/components/ui/NutrientIcons';
+import { getNutrientIcon } from '@/components/ui/NutrientIcons';
 
 interface MacronutrientTabProps {
   totalNutrients: {
