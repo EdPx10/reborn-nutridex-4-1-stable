@@ -2,7 +2,7 @@
 import React from 'react';
 import { UserProfile } from '@/types';
 import MacroNutrient from './MacroNutrient';
-import Accordion from '@/components/mon-assiette/Accordion';
+import Accordion from '@/components/mon-assiette/Accordion';  // Updated to use our custom Accordion
 
 interface MacroNutrientSectionProps {
   profile: UserProfile;
