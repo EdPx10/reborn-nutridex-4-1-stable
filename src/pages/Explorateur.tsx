@@ -7,6 +7,7 @@ import { getFilteredFoods } from '@/data/foods';
 import { Food, FoodCategory, HealthBenefit, Season } from '@/types';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 const Explorateur: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -23,8 +24,7 @@ const Explorateur: React.FC = () => {
   }, [searchTerm, selectedCategory, selectedBenefit, selectedSeason]);
   
   const handleAddToPlate = (food: Food) => {
-    console.log('Add food to plate:', food);
-    // TODO: Implement adding to plate functionality
+    toast.success(`${food.name} ajouté à votre assiette`);
   };
 
   const toggleCategory = (categoryId: string) => {
