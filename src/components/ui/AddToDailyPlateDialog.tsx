@@ -12,18 +12,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-export type PlateItem = {
-  food: Food;
-  quantity: number;
-  unit: string;
-};
+import { toast } from "@/hooks/use-toast";
+import { useDailyPlateStore } from '@/store/dailyPlateStore';
 
 interface AddToDailyPlateDialogProps {
   food: Food;
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (item: PlateItem) => void;
 }
 
 const UNITS = ["g", "ml", "c.à.café", "c.à.soupe"];
@@ -32,24 +27,29 @@ export const AddToDailyPlateDialog: React.FC<AddToDailyPlateDialogProps> = ({
   food, 
   isOpen, 
   onClose,
-  onConfirm 
 }) => {
   const [quantity, setQuantity] = useState("100");
   const [unit, setUnit] = useState(UNITS[0]);
+  const { addItem } = useDailyPlateStore();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const numericQuantity = parseFloat(quantity);
     
     if (isNaN(numericQuantity) || numericQuantity <= 0) {
-      // TODO: Add proper form validation
+      toast({
+        title: "Quantité invalide",
+        description: "Veuillez entrer une quantité valide",
+        variant: "destructive",
+      });
       return;
     }
 
-    onConfirm({
-      food,
-      quantity: numericQuantity,
-      unit
+    addItem(food, numericQuantity, unit);
+    
+    toast({
+      title: "Aliment ajouté",
+      description: `${food.name} a été ajouté à votre assiette du jour`,
     });
     
     onClose();

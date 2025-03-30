@@ -5,19 +5,18 @@ import { foodCategories } from '@/data/healthBenefits';
 import { NutrientBadge } from './NutrientBadge';
 import { Check, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import AddToDailyPlateDialog, { PlateItem } from './AddToDailyPlateDialog';
+import AddToDailyPlateDialog from './AddToDailyPlateDialog';
 import { useDailyPlateStore } from '@/store/dailyPlateStore';
 
 interface FoodCardProps {
   food: Food;
-  onAddToPlate?: (food: Food) => void;
 }
 
-export const FoodCard: React.FC<FoodCardProps> = ({ food, onAddToPlate }) => {
+export const FoodCard: React.FC<FoodCardProps> = ({ food }) => {
   const { id, name, category, healthBenefits, nutrients, image } = food;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
-  const { addItem, getItem } = useDailyPlateStore();
+  const { getItem } = useDailyPlateStore();
   const isInPlate = getItem(id) !== undefined;
   
   const categoryInfo = foodCategories.find(c => c.id === category);
@@ -26,13 +25,6 @@ export const FoodCard: React.FC<FoodCardProps> = ({ food, onAddToPlate }) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDialogOpen(true);
-  };
-  
-  const handleConfirmAdd = (item: PlateItem) => {
-    addItem(item.food, item.quantity, item.unit);
-    if (onAddToPlate) {
-      onAddToPlate(food);
-    }
   };
   
   return (
@@ -104,7 +96,6 @@ export const FoodCard: React.FC<FoodCardProps> = ({ food, onAddToPlate }) => {
         food={food}
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
-        onConfirm={handleConfirmAdd}
       />
     </>
   );
