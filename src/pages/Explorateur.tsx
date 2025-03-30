@@ -1,10 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { Search } from 'lucide-react';
+import { Search, Filter } from 'lucide-react';
 import { FoodCard } from '@/components/ui/FoodCard';
 import { foodCategories, healthBenefitsInfo, seasons } from '@/data/healthBenefits';
 import { getFilteredFoods } from '@/data/foods';
 import { Food, FoodCategory, HealthBenefit, Season } from '@/types';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Button } from '@/components/ui/button';
 
 const Explorateur: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -12,6 +14,8 @@ const Explorateur: React.FC = () => {
   const [selectedBenefit, setSelectedBenefit] = useState<string | undefined>(undefined);
   const [selectedSeason, setSelectedSeason] = useState<string | undefined>(undefined);
   const [foods, setFoods] = useState<Food[]>([]);
+  const [showFilters, setShowFilters] = useState(false);
+  const isMobile = useIsMobile();
   
   useEffect(() => {
     const filtered = getFilteredFoods(searchTerm, selectedCategory, selectedBenefit, selectedSeason);
@@ -47,6 +51,13 @@ const Explorateur: React.FC = () => {
     }
   };
   
+  const toggleFilters = () => {
+    setShowFilters(!showFilters);
+  };
+
+  // Déterminer si on affiche les filtres basé sur la taille d'écran et l'état
+  const displayFilters = !isMobile || showFilters;
+  
   return (
     <div className="animate-fade-in">
       <div className="text-center mb-8">
@@ -68,68 +79,92 @@ const Explorateur: React.FC = () => {
         />
       </div>
       
-      <div className="mb-8">
-        <h3 className="font-medium text-lg mb-3">Filtres</h3>
-        
-        <div className="space-y-4">
-          <div>
-            <h4 className="text-sm text-gray-500 mb-2">Catégories</h4>
-            <div className="flex flex-wrap gap-2">
-              {foodCategories.map(category => (
-                <button
-                  key={category.id}
-                  onClick={() => toggleCategory(category.id)}
-                  className={`px-3 py-1 text-sm rounded-full transition ${
-                    selectedCategory === category.id 
-                      ? `${category.color} font-medium` 
-                      : 'bg-gray-100 hover:bg-gray-200'
-                  }`}
-                >
-                  {category.name}
-                </button>
-              ))}
-            </div>
-          </div>
-          
-          <div>
-            <h4 className="text-sm text-gray-500 mb-2">Propriétés santé</h4>
-            <div className="flex flex-wrap gap-2">
-              {Object.entries(healthBenefitsInfo).map(([id, benefit]) => (
-                <button
-                  key={id}
-                  onClick={() => toggleBenefit(id)}
-                  className={`px-3 py-1 text-sm rounded-full flex items-center gap-1 transition ${
-                    selectedBenefit === id
-                      ? benefit.color
-                      : 'bg-gray-100 hover:bg-gray-200'
-                  }`}
-                >
-                  <benefit.icon size={14} />
-                  <span>{benefit.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-          
-          <div>
-            <h4 className="text-sm text-gray-500 mb-2">Saisons</h4>
-            <div className="flex flex-wrap gap-2">
-              {seasons.map(season => (
-                <button
-                  key={season.id}
-                  onClick={() => toggleSeason(season.id)}
-                  className={`px-3 py-1 text-sm rounded-full transition ${
-                    selectedSeason === season.id 
-                      ? 'bg-nutri-green text-white font-medium' 
-                      : 'bg-gray-100 hover:bg-gray-200'
-                  }`}
-                >
-                  {season.name}
-                </button>
-              ))}
-            </div>
-          </div>
+      {isMobile && (
+        <div className="mb-4 flex justify-center">
+          <Button 
+            variant="outline" 
+            onClick={toggleFilters}
+            className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 bg-white shadow-sm"
+          >
+            <Filter size={16} />
+            Filtres
+            {showFilters ? (
+              <span className="ml-1 text-xs bg-nutri-green text-white rounded-full h-5 w-5 flex items-center justify-center">
+                {(selectedCategory ? 1 : 0) + (selectedBenefit ? 1 : 0) + (selectedSeason ? 1 : 0)}
+              </span>
+            ) : null}
+          </Button>
         </div>
+      )}
+      
+      <div className={`mb-8 ${isMobile ? 'overflow-hidden transition-all duration-300 ease-in-out' : ''}`} 
+           style={{ 
+             maxHeight: isMobile ? (displayFilters ? '1000px' : '0px') : 'auto',
+             opacity: isMobile ? (displayFilters ? 1 : 0) : 1,
+           }}>
+        {displayFilters && (
+          <div className={`space-y-4 ${isMobile ? 'animate-fade-in' : ''}`}>
+            <h3 className="font-medium text-lg mb-3">Filtres</h3>
+            
+            <div>
+              <h4 className="text-sm text-gray-500 mb-2">Catégories</h4>
+              <div className="flex flex-wrap gap-2">
+                {foodCategories.map(category => (
+                  <button
+                    key={category.id}
+                    onClick={() => toggleCategory(category.id)}
+                    className={`px-3 py-1 text-sm rounded-full transition ${
+                      selectedCategory === category.id 
+                        ? `${category.color} font-medium` 
+                        : 'bg-gray-100 hover:bg-gray-200'
+                    }`}
+                  >
+                    {category.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            <div>
+              <h4 className="text-sm text-gray-500 mb-2">Propriétés santé</h4>
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(healthBenefitsInfo).map(([id, benefit]) => (
+                  <button
+                    key={id}
+                    onClick={() => toggleBenefit(id)}
+                    className={`px-3 py-1 text-sm rounded-full flex items-center gap-1 transition ${
+                      selectedBenefit === id
+                        ? benefit.color
+                        : 'bg-gray-100 hover:bg-gray-200'
+                    }`}
+                  >
+                    <benefit.icon size={14} />
+                    <span>{benefit.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            <div>
+              <h4 className="text-sm text-gray-500 mb-2">Saisons</h4>
+              <div className="flex flex-wrap gap-2">
+                {seasons.map(season => (
+                  <button
+                    key={season.id}
+                    onClick={() => toggleSeason(season.id)}
+                    className={`px-3 py-1 text-sm rounded-full transition ${
+                      selectedSeason === season.id 
+                        ? 'bg-nutri-green text-white font-medium' 
+                        : 'bg-gray-100 hover:bg-gray-200'
+                    }`}
+                  >
+                    {season.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
