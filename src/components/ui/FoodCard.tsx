@@ -7,6 +7,7 @@ import { Check, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AddToDailyPlateDialog from './AddToDailyPlateDialog';
 import { useDailyPlateStore } from '@/store/dailyPlateStore';
+import { toast } from '@/hooks/use-toast';
 
 interface FoodCardProps {
   food: Food;
@@ -16,15 +17,26 @@ export const FoodCard: React.FC<FoodCardProps> = ({ food }) => {
   const { id, name, category, healthBenefits, nutrients, image } = food;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
-  const { getItem } = useDailyPlateStore();
+  const { getItem, removeItem } = useDailyPlateStore();
   const isInPlate = getItem(id) !== undefined;
   
   const categoryInfo = foodCategories.find(c => c.id === category);
   
-  const handleAddClick = (e: React.MouseEvent) => {
+  const handleButtonClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsDialogOpen(true);
+    
+    if (isInPlate) {
+      // If item is already in plate, remove it
+      removeItem(id);
+      toast({
+        title: "Aliment retiré",
+        description: `${name} a été retiré de votre assiette du jour`,
+      });
+    } else {
+      // If item is not in plate, open dialog to add it
+      setIsDialogOpen(true);
+    }
   };
   
   return (
@@ -49,7 +61,7 @@ export const FoodCard: React.FC<FoodCardProps> = ({ food }) => {
               </span>
             </div>
             <button 
-              onClick={handleAddClick}
+              onClick={handleButtonClick}
               className={`absolute bottom-2 right-2 w-8 h-8 rounded-full flex items-center justify-center shadow-md
                 ${isInPlate ? 'bg-nutri-green text-white' : 'bg-white hover:bg-gray-50'}`}
             >
