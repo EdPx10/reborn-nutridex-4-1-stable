@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
 import { Food } from '@/types';
-import { foodCategories } from '@/data/healthBenefits';
+import { foodCategories, healthBenefitsInfo, seasons } from '@/data/healthBenefits';
 import { NutrientBadge } from './NutrientBadge';
-import { Check, Plus } from 'lucide-react';
+import { Check, Plus, CloudSun, Snowflake, Leaf, Sun } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AddToDailyPlateDialog from './AddToDailyPlateDialog';
 import { useDailyPlateStore } from '@/store/dailyPlateStore';
@@ -14,7 +14,7 @@ interface FoodCardProps {
 }
 
 export const FoodCard: React.FC<FoodCardProps> = ({ food }) => {
-  const { id, name, category, healthBenefits, nutrients, image } = food;
+  const { id, name, category, healthBenefits, nutrients, image, seasons: foodSeasons = [] } = food;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
   const { getItem, removeItem } = useDailyPlateStore();
@@ -39,6 +39,27 @@ export const FoodCard: React.FC<FoodCardProps> = ({ food }) => {
     }
   };
   
+  // Get the first season of the food item to display
+  const currentSeason = foodSeasons && foodSeasons.length > 0 ? foodSeasons[0] : null;
+  
+  // Map season to its corresponding icon
+  const getSeasonIcon = (season: string | null) => {
+    if (!season) return null;
+    
+    switch (season) {
+      case 'printemps':
+        return <Leaf size={18} className="text-nutri-green" />;
+      case 'ete':
+        return <Sun size={18} className="text-amber-500" />;
+      case 'automne':
+        return <CloudSun size={18} className="text-orange-500" />;
+      case 'hiver':
+        return <Snowflake size={18} className="text-blue-500" />;
+      default:
+        return null;
+    }
+  };
+  
   return (
     <>
       <Link to={`/aliment/${id}`} className="block">
@@ -60,6 +81,11 @@ export const FoodCard: React.FC<FoodCardProps> = ({ food }) => {
                 {categoryInfo?.name || category}
               </span>
             </div>
+            {currentSeason && (
+              <div className="absolute top-2 right-2 bg-white rounded-full p-1.5 shadow-sm">
+                {getSeasonIcon(currentSeason)}
+              </div>
+            )}
             <button 
               onClick={handleButtonClick}
               className={`absolute bottom-2 right-2 w-8 h-8 rounded-full flex items-center justify-center shadow-md
@@ -91,14 +117,20 @@ export const FoodCard: React.FC<FoodCardProps> = ({ food }) => {
               </div>
             </div>
             
-            <div className="flex flex-wrap gap-1 mt-3">
-              {healthBenefits.map((benefit) => (
-                <NutrientBadge 
-                  key={benefit} 
-                  type={benefit} 
-                  showName={false} 
-                />
-              ))}
+            <div className="mt-3 space-y-2">
+              <p className="text-sm text-gray-600 font-medium">Bienfaits santé:</p>
+              <div className="flex flex-col gap-2">
+                {healthBenefits.map((benefit) => (
+                  <div key={benefit} className="flex items-center gap-2">
+                    <NutrientBadge 
+                      key={benefit} 
+                      type={benefit} 
+                      showName={true} 
+                      className="text-xs py-1 px-2"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
