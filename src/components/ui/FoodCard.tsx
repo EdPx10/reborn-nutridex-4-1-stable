@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Food } from '@/types';
 import { foodCategories, healthBenefitsInfo, seasons } from '@/data/healthBenefits';
@@ -27,22 +26,18 @@ export const FoodCard: React.FC<FoodCardProps> = ({ food }) => {
     e.stopPropagation();
     
     if (isInPlate) {
-      // If item is already in plate, remove it
       removeItem(id);
       toast({
         title: "Aliment retiré",
         description: `${name} a été retiré de votre assiette du jour`,
       });
     } else {
-      // If item is not in plate, open dialog to add it
       setIsDialogOpen(true);
     }
   };
   
-  // Get the first season of the food item to display
   const currentSeason = foodSeasons && foodSeasons.length > 0 ? foodSeasons[0] : null;
   
-  // Map season to its corresponding icon
   const getSeasonIcon = (season: string | null) => {
     if (!season) return null;
     

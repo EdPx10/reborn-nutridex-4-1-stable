@@ -7,11 +7,15 @@ import { foodCategories } from '@/data/healthBenefits';
 import { NutrientBadge } from '@/components/ui/NutrientBadge';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { ChevronLeft, Plus, Check } from 'lucide-react';
+import { useDailyPlateStore } from '@/store/dailyPlateStore';
+import { toast } from '@/hooks/use-toast';
 
 const FicheAliment: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [food, setFood] = useState<Food | null>(null);
-  const [isAdded, setIsAdded] = useState(false);
+  
+  const { getItem, addItem, removeItem } = useDailyPlateStore();
+  const isInPlate = id ? getItem(id) !== undefined : false;
   
   useEffect(() => {
     if (id) {
@@ -20,16 +24,27 @@ const FicheAliment: React.FC = () => {
     }
   }, [id]);
   
-  const handleAddToPlate = () => {
+  const handleTogglePlate = () => {
     if (!food) return;
     
-    // TODO: Implement adding to plate functionality
-    console.log('Adding to plate:', food);
-    
-    setIsAdded(true);
-    setTimeout(() => {
-      setIsAdded(false);
-    }, 2000);
+    if (isInPlate && id) {
+      removeItem(id);
+      toast({
+        title: "Aliment retiré",
+        description: `${food.name} a été retiré de votre assiette du jour`,
+      });
+    } else {
+      addItem({
+        id: food.id,
+        quantity: 1,
+        unit: food.portion.unit,
+        food: food
+      });
+      toast({
+        title: "Aliment ajouté",
+        description: `${food.name} a été ajouté à votre assiette du jour`,
+      });
+    }
   };
   
   if (!food) {
@@ -76,17 +91,17 @@ const FicheAliment: React.FC = () => {
           <div className="flex justify-between items-start">
             <h1 className="text-3xl font-bold">{food.name}</h1>
             <button
-              onClick={handleAddToPlate}
+              onClick={handleTogglePlate}
               className={`px-4 py-2 rounded-full flex items-center gap-2 ${
-                isAdded 
+                isInPlate 
                   ? 'bg-green-100 text-green-700' 
                   : 'bg-nutri-green text-white'
               }`}
             >
-              {isAdded ? (
+              {isInPlate ? (
                 <>
                   <Check size={18} />
-                  <span>Ajouté</span>
+                  <span>Retiré</span>
                 </>
               ) : (
                 <>
