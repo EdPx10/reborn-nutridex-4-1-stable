@@ -6,7 +6,7 @@ export const fruits: Food[] = [
     id: 'bleuet',
     name: 'Bleuet',
     category: 'fruit',
-    image: '/lovable-uploads/7926bccf-3e7b-445e-bd76-dcd72549a3f1.png',
+    image: 'https://media.istockphoto.com/id/1601099150/fr/photo/myrtilles-fra%C3%AEches-m%C3%BBres-avec-des-feuilles-vertes-isol%C3%A9es-sur-blanc.jpg?s=1024x1024&w=is&k=20&c=Wrc8vm6419jHuNDBIYUDOEJ7mCB5Hevx3bQB8MdAdRU=',
     nutrients: {
       glucides: 14.5,
       proteines: 0.7,
