@@ -22,10 +22,6 @@ const Explorateur: React.FC = () => {
     const filtered = getFilteredFoods(searchTerm, selectedCategory, selectedBenefit, selectedSeason);
     setFoods(filtered);
   }, [searchTerm, selectedCategory, selectedBenefit, selectedSeason]);
-  
-  const handleAddToPlate = (food: Food) => {
-    toast.success(`${food.name} ajouté à votre assiette`);
-  };
 
   const toggleCategory = (categoryId: string) => {
     if (selectedCategory === categoryId) {
@@ -171,8 +167,7 @@ const Explorateur: React.FC = () => {
         {foods.map(food => (
           <FoodCard 
             key={food.id} 
-            food={food} 
-            onAddToPlate={handleAddToPlate}
+            food={food}
           />
         ))}
         {foods.length === 0 && (
