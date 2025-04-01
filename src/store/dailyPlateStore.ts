@@ -17,12 +17,18 @@ interface DailyPlateState {
   updateItem: (foodId: string, quantity: number, unit: string) => void;
   getItem: (foodId: string) => PlateItem | undefined;
   clearPlate: () => void;
+  lastResetDate: string;
+  checkAndResetIfNewDay: () => void;
 }
 
 export const useDailyPlateStore = create<DailyPlateState>((set, get) => ({
   items: [],
+  lastResetDate: new Date().toDateString(),
   
   addItem: (item: {id: string; food: Food; quantity: number; unit: string}) => {
+    // Vérifier si c'est un nouveau jour
+    get().checkAndResetIfNewDay();
+    
     set((state) => {
       // Check if food already exists in plate
       const existingItemIndex = state.items.findIndex(i => i.id === item.id);
@@ -69,4 +75,33 @@ export const useDailyPlateStore = create<DailyPlateState>((set, get) => ({
   },
   
   clearPlate: () => set({ items: [] }),
+  
+  checkAndResetIfNewDay: () => {
+    const today = new Date().toDateString();
+    const { lastResetDate } = get();
+    
+    if (lastResetDate !== today) {
+      set({ 
+        items: [],
+        lastResetDate: today
+      });
+      
+      // Stockage de la date de dernière réinitialisation
+      localStorage.setItem('nutridex-last-reset', today);
+      
+      console.log('Assiette réinitialisée pour le nouveau jour:', today);
+    }
+  }
 }));
+
+// Initialiser la vérification lors de l'importation du module
+if (typeof window !== 'undefined') {
+  // Récupérer la dernière date de réinitialisation depuis localStorage
+  const storedResetDate = localStorage.getItem('nutridex-last-reset');
+  const today = new Date().toDateString();
+  
+  // Si c'est un nouveau jour, réinitialiser l'assiette au chargement
+  if (storedResetDate !== today) {
+    useDailyPlateStore.getState().checkAndResetIfNewDay();
+  }
+}

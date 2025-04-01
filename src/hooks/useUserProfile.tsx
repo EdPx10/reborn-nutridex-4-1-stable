@@ -100,11 +100,63 @@ export const useUserProfile = () => {
     localStorage.setItem('nutridex-profiles', JSON.stringify(updatedProfiles));
   };
 
+  // Nouvelle fonction pour mettre à jour les apports nutritionnels
+  const updateNutrientIntake = (nutrients: {
+    glucides?: number;
+    proteines?: number;
+    lipides?: number;
+    fibres?: number;
+    vitamines?: Record<string, number>;
+    mineraux?: Record<string, number>;
+    oligoelements?: Record<string, number>;
+  }) => {
+    if (!activeProfile) return;
+
+    const updatedProfile = { ...activeProfile };
+    
+    // Mise à jour des macronutriments
+    if (nutrients.glucides !== undefined) updatedProfile.goals.glucides.current = nutrients.glucides;
+    if (nutrients.proteines !== undefined) updatedProfile.goals.proteines.current = nutrients.proteines;
+    if (nutrients.lipides !== undefined) updatedProfile.goals.lipides.current = nutrients.lipides;
+    if (nutrients.fibres !== undefined) updatedProfile.goals.fibres.current = nutrients.fibres;
+    
+    // Mise à jour des vitamines
+    if (nutrients.vitamines) {
+      Object.entries(nutrients.vitamines).forEach(([key, value]) => {
+        if (updatedProfile.goals.vitamines[key]) {
+          updatedProfile.goals.vitamines[key].current = value;
+        }
+      });
+    }
+    
+    // Mise à jour des minéraux
+    if (nutrients.mineraux) {
+      Object.entries(nutrients.mineraux).forEach(([key, value]) => {
+        if (updatedProfile.goals.mineraux[key]) {
+          updatedProfile.goals.mineraux[key].current = value;
+        }
+      });
+    }
+    
+    // Mise à jour des oligo-éléments
+    if (nutrients.oligoelements && updatedProfile.goals.oligoelements) {
+      Object.entries(nutrients.oligoelements).forEach(([key, value]) => {
+        if (updatedProfile.goals.oligoelements?.[key]) {
+          updatedProfile.goals.oligoelements[key].current = value;
+        }
+      });
+    }
+    
+    // Met à jour le profile
+    updateProfile(updatedProfile);
+  };
+
   return {
     profiles,
     activeProfile,
     createProfile,
     updateProfile,
     setActiveProfileById,
+    updateNutrientIntake,
   };
 };

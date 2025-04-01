@@ -25,10 +25,10 @@ export const FoodList: React.FC<FoodListProps> = ({ items, onRemoveItem, onUpdat
     <div className="space-y-4">
       {items.map((item) => (
         <ConsumedFoodItem 
-          key={`${item.food.id}-${item.addedAt.toISOString()}`}
+          key={`${item.id}-${item.addedAt.toISOString()}`}
           item={item}
-          onRemove={() => onRemoveItem(item.food.id)}
-          onUpdate={(quantity, unit) => onUpdateItem(item.food.id, quantity, unit)}
+          onRemove={() => onRemoveItem(item.id)}
+          onUpdate={(quantity, unit) => onUpdateItem(item.id, quantity, unit)}
         />
       ))}
     </div>

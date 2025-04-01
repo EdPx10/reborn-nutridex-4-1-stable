@@ -3,13 +3,38 @@ import React from 'react';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import ProfileCard from '@/components/profile/ProfileCard';
 import { Plus } from 'lucide-react';
+import { useDailyPlateStore } from '@/store/dailyPlateStore';
+import { useEffect } from 'react';
+import { calculateTotalNutrients } from '@/components/mon-assiette/NutrientCalculator';
 
 const ProfilUtilisateur: React.FC = () => {
-  const { profiles, activeProfile, createProfile, updateProfile, setActiveProfileById } = useUserProfile();
+  const { profiles, activeProfile, updateProfile, setActiveProfileById, updateNutrientIntake } = useUserProfile();
+  const { items, checkAndResetIfNewDay } = useDailyPlateStore();
   
   const handleActivateUser = (profileId: string) => {
     setActiveProfileById(profileId);
   };
+  
+  // Vérifier si nous devons réinitialiser l'assiette lors du chargement de la page
+  useEffect(() => {
+    checkAndResetIfNewDay();
+  }, [checkAndResetIfNewDay]);
+  
+  // Synchroniser les apports nutritionnels avec le profil utilisateur
+  useEffect(() => {
+    if (activeProfile && items.length > 0) {
+      const totalNutrients = calculateTotalNutrients(items);
+      updateNutrientIntake({
+        glucides: totalNutrients.glucides,
+        proteines: totalNutrients.proteines,
+        lipides: totalNutrients.lipides,
+        fibres: totalNutrients.fibres,
+        vitamines: totalNutrients.vitamines,
+        mineraux: totalNutrients.mineraux,
+        oligoelements: totalNutrients.oligoelements
+      });
+    }
+  }, [items, activeProfile, updateNutrientIntake]);
   
   return (
     <div className="animate-fade-in">

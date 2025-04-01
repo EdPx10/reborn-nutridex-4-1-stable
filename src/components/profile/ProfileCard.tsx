@@ -1,7 +1,10 @@
 
 import React, { useState } from 'react';
 import { UserProfile } from '@/types';
-import { Edit, User, Plus } from 'lucide-react';
+import { Check, ChevronRight, User } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import TabButton from './TabButton';
 import MacroNutrientSection from './MacroNutrientSection';
 import MicroNutrientSection from './MicroNutrientSection';
@@ -12,74 +15,100 @@ interface ProfileCardProps {
   onActivate: () => void;
 }
 
-const ProfileCard: React.FC<ProfileCardProps> = ({ 
-  profile, 
-  isActive, 
-  onActivate
-}) => {
-  const [activeTab, setActiveTab] = useState('macronutriments');
+const ProfileCard: React.FC<ProfileCardProps> = ({ profile, isActive, onActivate }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'macros' | 'micros'>('macros');
+
+  const closeDialog = () => setIsOpen(false);
   
   return (
-    <div className={`border rounded-xl mb-8 ${
-      isActive ? 'border-nutri-green' : 'border-gray-200'
-    }`}>
-      <div className="p-6">
+    <>
+      <div 
+        className={`mb-4 p-4 rounded-lg border ${isActive ? 'border-nutri-green bg-green-50' : 'border-gray-200'}`}
+        onClick={() => setIsOpen(true)}
+      >
         <div className="flex justify-between items-center">
-          <div>
-            <h2 className="text-2xl font-bold">{profile.name}</h2>
-            <p className="text-gray-600">
-              Sexe : {profile.gender.charAt(0).toUpperCase() + profile.gender.slice(1)}
-              {profile.weight && ` • Poids : ${profile.weight} kg`}
-            </p>
-          </div>
-          
           <div className="flex items-center gap-3">
-            {isActive ? (
-              <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full">
-                Actif
+            <div className="h-10 w-10 bg-nutri-green/10 rounded-full flex items-center justify-center">
+              <User size={20} className="text-nutri-green" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg">{profile.name}</h3>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-500">{profile.age} ans</span>
+                <span className="text-sm text-gray-500">•</span>
+                <span className="text-sm text-gray-500">{profile.weight} kg</span>
+                <span className="text-sm text-gray-500">•</span>
+                <span className="text-sm text-gray-500">{profile.height} cm</span>
               </div>
-            ) : (
-              <button 
-                onClick={onActivate}
-                className="px-3 py-1 border border-nutri-green text-nutri-green rounded-full hover:bg-nutri-light"
-              >
-                Activer
-              </button>
-            )}
-            <button className="p-2 text-gray-500 hover:text-nutri-green">
-              <Edit size={18} />
-            </button>
-          </div>
-        </div>
-        
-        <div className="mt-6">
-          <div className="flex border-b">
-            <TabButton 
-              active={activeTab === 'macronutriments'} 
-              onClick={() => setActiveTab('macronutriments')}
-            >
-              Macronutriments
-            </TabButton>
-            <TabButton 
-              active={activeTab === 'micronutriments'} 
-              onClick={() => setActiveTab('micronutriments')}
-            >
-              Micronutriments
-            </TabButton>
+            </div>
           </div>
           
-          <div className="pt-6">
-            {activeTab === 'macronutriments' && (
-              <MacroNutrientSection profile={profile} />
+          <div className="flex items-center gap-2">
+            {isActive && (
+              <Badge className="bg-nutri-green">
+                <Check size={14} className="mr-1" />
+                Actif
+              </Badge>
             )}
-            
-            {activeTab === 'micronutriments' && (
-              <MicroNutrientSection profile={profile} />
-            )}
+            <ChevronRight className="text-gray-400" />
           </div>
         </div>
       </div>
-    </div>
+
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">{profile.name}</DialogTitle>
+          </DialogHeader>
+          
+          <div className="flex justify-center mt-2 mb-6">
+            <div className="inline-flex border rounded-lg overflow-hidden">
+              <TabButton 
+                active={activeTab === 'macros'} 
+                onClick={() => setActiveTab('macros')}
+              >
+                Macronutriments
+              </TabButton>
+              <TabButton 
+                active={activeTab === 'micros'} 
+                onClick={() => setActiveTab('micros')}
+              >
+                Micronutriments
+              </TabButton>
+            </div>
+          </div>
+          
+          {activeTab === 'macros' && (
+            <MacroNutrientSection profile={profile} />
+          )}
+          
+          {activeTab === 'micros' && (
+            <MicroNutrientSection profile={profile} />
+          )}
+          
+          <div className="flex justify-between mt-6 pt-4 border-t">
+            <Button 
+              variant="outline" 
+              onClick={closeDialog}
+            >
+              Fermer
+            </Button>
+            
+            {!isActive && (
+              <Button 
+                onClick={() => {
+                  onActivate();
+                  closeDialog();
+                }}
+              >
+                Activer ce profil
+              </Button>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

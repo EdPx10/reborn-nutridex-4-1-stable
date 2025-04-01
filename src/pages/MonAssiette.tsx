@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useDailyPlateStore } from '@/store/dailyPlateStore';
 import SearchBar from '@/components/mon-assiette/SearchBar';
@@ -9,11 +9,26 @@ import { calculateTotalNutrients } from '@/components/mon-assiette/NutrientCalcu
 
 const MonAssiette: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const { activeProfile } = useUserProfile();
+  const { activeProfile, updateNutrientIntake } = useUserProfile();
   const { items, removeItem, clearPlate, updateItem } = useDailyPlateStore();
   
   // Calculate total nutrients using the utility function
   const totalNutrients = calculateTotalNutrients(items);
+  
+  // Synchroniser les apports nutritionnels avec le profil utilisateur
+  useEffect(() => {
+    if (activeProfile) {
+      updateNutrientIntake({
+        glucides: totalNutrients.glucides,
+        proteines: totalNutrients.proteines,
+        lipides: totalNutrients.lipides,
+        fibres: totalNutrients.fibres,
+        vitamines: totalNutrients.vitamines,
+        mineraux: totalNutrients.mineraux,
+        oligoelements: totalNutrients.oligoelements
+      });
+    }
+  }, [totalNutrients, activeProfile, updateNutrientIntake]);
   
   return (
     <div className="animate-fade-in">
