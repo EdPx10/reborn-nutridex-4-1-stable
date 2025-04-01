@@ -8,6 +8,8 @@ import { Food, FoodCategory, HealthBenefit, Season } from '@/types';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import AddToDailyPlateDialog from '@/components/ui/AddToDailyPlateDialog';
 
 const Explorateur: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -16,12 +18,39 @@ const Explorateur: React.FC = () => {
   const [selectedSeason, setSelectedSeason] = useState<string | undefined>(undefined);
   const [foods, setFoods] = useState<Food[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [searchResults, setSearchResults] = useState<Food[]>([]);
+  const [selectedFood, setSelectedFood] = useState<Food | null>(null);
+  const [quantityDialogOpen, setQuantityDialogOpen] = useState(false);
   const isMobile = useIsMobile();
   
   useEffect(() => {
     const filtered = getFilteredFoods(searchTerm, selectedCategory, selectedBenefit, selectedSeason);
     setFoods(filtered);
   }, [searchTerm, selectedCategory, selectedBenefit, selectedSeason]);
+
+  // Handle search input changes
+  useEffect(() => {
+    if (searchTerm.length > 0) {
+      const results = getFilteredFoods(searchTerm).slice(0, 8); // Limit to 8 results for better UX
+      setSearchResults(results);
+      setShowSearchResults(true);
+    } else {
+      setShowSearchResults(false);
+    }
+  }, [searchTerm]);
+
+  const handleSelectFood = (food: Food) => {
+    setSelectedFood(food);
+    setQuantityDialogOpen(true);
+    setSearchTerm('');
+    setShowSearchResults(false);
+  };
+
+  const handleQuantityDialogClose = () => {
+    setQuantityDialogOpen(false);
+    setTimeout(() => setSelectedFood(null), 300);
+  };
 
   const toggleCategory = (categoryId: string) => {
     if (selectedCategory === categoryId) {
@@ -73,6 +102,28 @@ const Explorateur: React.FC = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full pl-10 pr-4 py-3 rounded-full border border-gray-200 focus:outline-none focus:border-nutri-green focus:ring-1 focus:ring-nutri-green"
         />
+
+        {/* Search results dropdown */}
+        {showSearchResults && searchResults.length > 0 && (
+          <div className="absolute z-10 w-full mt-1 rounded-md border border-gray-200 bg-white shadow-lg">
+            <Command className="rounded-md">
+              <CommandList>
+                {searchResults.map((food) => (
+                  <CommandItem
+                    key={food.id}
+                    onSelect={() => handleSelectFood(food)}
+                    className="flex items-center gap-2 cursor-pointer p-2"
+                  >
+                    <div className="flex-1">
+                      <div>{food.name}</div>
+                      <div className="text-xs text-gray-500">{food.category}</div>
+                    </div>
+                  </CommandItem>
+                ))}
+              </CommandList>
+            </Command>
+          </div>
+        )}
       </div>
       
       {isMobile && (
@@ -176,6 +227,15 @@ const Explorateur: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Quantity Dialog for adding selected food to daily plate */}
+      {selectedFood && (
+        <AddToDailyPlateDialog
+          food={selectedFood}
+          isOpen={quantityDialogOpen}
+          onClose={handleQuantityDialogClose}
+        />
+      )}
     </div>
   );
 };

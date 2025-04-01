@@ -1,7 +1,11 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Trash2 } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Command, CommandEmpty, CommandItem, CommandList } from '@/components/ui/command';
+import { getFilteredFoods } from '@/data/foods';
+import { Food } from '@/types';
+import AddToDailyPlateDialog from '@/components/ui/AddToDailyPlateDialog';
 
 interface SearchBarProps {
   searchTerm: string;
@@ -16,6 +20,33 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   clearPlate,
   itemsCount
 }) => {
+  const [searchResults, setSearchResults] = useState<Food[]>([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [selectedFood, setSelectedFood] = useState<Food | null>(null);
+  const [quantityDialogOpen, setQuantityDialogOpen] = useState(false);
+
+  // Update search results when search term changes
+  useEffect(() => {
+    if (searchTerm.length > 0) {
+      setSearchResults(getFilteredFoods(searchTerm).slice(0, 8)); // Limit to 8 results
+      setShowSearchResults(true);
+    } else {
+      setShowSearchResults(false);
+    }
+  }, [searchTerm]);
+
+  const handleSelectFood = (food: Food) => {
+    setSelectedFood(food);
+    setQuantityDialogOpen(true);
+    setSearchTerm('');
+    setShowSearchResults(false);
+  };
+
+  const handleQuantityDialogClose = () => {
+    setQuantityDialogOpen(false);
+    setTimeout(() => setSelectedFood(null), 300);
+  };
+
   return (
     <div className="relative max-w-md mx-auto mb-6 flex">
       <div className="relative flex-grow">
@@ -27,6 +58,31 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full pl-10 pr-4 py-3 rounded-l-full border-y border-l border-gray-200 focus:outline-none focus:border-nutri-green focus:ring-1 focus:ring-nutri-green"
         />
+
+        {/* Search results dropdown */}
+        {showSearchResults && searchResults.length > 0 && (
+          <div className="absolute z-10 w-full mt-1 rounded-md border border-gray-200 bg-white shadow-lg">
+            <Command className="rounded-md">
+              <CommandList>
+                {searchResults.map((food) => (
+                  <CommandItem
+                    key={food.id}
+                    onSelect={() => handleSelectFood(food)}
+                    className="flex items-center gap-2 cursor-pointer p-2"
+                  >
+                    <div className="flex-1">
+                      <div>{food.name}</div>
+                      <div className="text-xs text-gray-500">{food.category}</div>
+                    </div>
+                  </CommandItem>
+                ))}
+              </CommandList>
+              {searchResults.length === 0 && (
+                <CommandEmpty>Aucun aliment trouvé</CommandEmpty>
+              )}
+            </Command>
+          </div>
+        )}
       </div>
       <AlertDialog>
         <AlertDialogTrigger asChild>
@@ -51,6 +107,15 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Quantity Dialog for adding selected food to daily plate */}
+      {selectedFood && (
+        <AddToDailyPlateDialog
+          food={selectedFood}
+          isOpen={quantityDialogOpen}
+          onClose={handleQuantityDialogClose}
+        />
+      )}
     </div>
   );
 };
