@@ -59,29 +59,31 @@ const MacroNutrientSection: React.FC<MacroNutrientSectionProps> = ({ profile }) 
               indent={true}
             />
             
-            <MacroNutrient
-              label="Oméga-3"
-              nutrientKey="lipides"
-              goal={{
-                current: profile.goals.lipides.current * 0.05,
-                goal: 2,
-                unit: 'g'
-              }}
-              showIcon={false}
-              indent={true}
-            />
-            
-            <MacroNutrient
-              label="Oméga-6"
-              nutrientKey="lipides"
-              goal={{
-                current: profile.goals.lipides.current * 0.1,
-                goal: 10,
-                unit: 'g'
-              }}
-              showIcon={false}
-              indent={true}
-            />
+            <div className="ml-6 space-y-6 mt-6">
+              <MacroNutrient
+                label="Oméga-3"
+                nutrientKey="lipides"
+                goal={{
+                  current: profile.goals.lipides.current * 0.05,
+                  goal: 2,
+                  unit: 'g'
+                }}
+                showIcon={false}
+                indent={true}
+              />
+              
+              <MacroNutrient
+                label="Oméga-6"
+                nutrientKey="lipides"
+                goal={{
+                  current: profile.goals.lipides.current * 0.1,
+                  goal: 10,
+                  unit: 'g'
+                }}
+                showIcon={false}
+                indent={true}
+              />
+            </div>
           </div>
         </Accordion>
       </div>

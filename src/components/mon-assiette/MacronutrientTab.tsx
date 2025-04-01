@@ -108,23 +108,25 @@ export const MacronutrientTab: React.FC<MacronutrientTabProps> = ({
               indent={true}
             />
             
-            <NutrientProgress
-              label="Oméga-3"
-              current={totalNutrients.lipids.omega3}
-              goal={2} // Recommandation générale
-              unit="g"
-              color="bg-nutri-yellow"
-              indent={true}
-            />
-            
-            <NutrientProgress
-              label="Oméga-6"
-              current={totalNutrients.lipids.omega6}
-              goal={10} // Recommandation générale
-              unit="g"
-              color="bg-nutri-yellow"
-              indent={true}
-            />
+            <div className="ml-6">
+              <NutrientProgress
+                label="Oméga-3"
+                current={totalNutrients.lipids.omega3}
+                goal={2} // Recommandation générale
+                unit="g"
+                color="bg-nutri-yellow"
+                indent={true}
+              />
+              
+              <NutrientProgress
+                label="Oméga-6"
+                current={totalNutrients.lipids.omega6}
+                goal={10} // Recommandation générale
+                unit="g"
+                color="bg-nutri-yellow"
+                indent={true}
+              />
+            </div>
           </div>
         )}
       </div>
