@@ -67,49 +67,80 @@ export const AddToDailyPlateDialog: React.FC<AddToDailyPlateDialogProps> = ({
           <DialogTitle>Ajouter {food.name} à mon assiette</DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="quantity">Quantité</Label>
-              <Input
-                id="quantity"
-                type="number"
-                min="0"
-                step="any"
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
-                className="col-span-3"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="unit">Unité</Label>
-              <Select value={unit} onValueChange={setUnit}>
-                <SelectTrigger id="unit">
-                  <SelectValue placeholder="Unité" />
-                </SelectTrigger>
-                <SelectContent>
-                  {UNITS.map(unit => (
-                    <SelectItem key={unit} value={unit}>
-                      {unit}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          
-          <DialogFooter className="mt-4">
-            <Button variant="outline" type="button" onClick={onClose}>
-              Annuler
-            </Button>
-            <Button type="submit">
-              Ajouter
-            </Button>
-          </DialogFooter>
-        </form>
+        <div className="py-4">
+          <QuantityForm 
+            quantity={quantity} 
+            setQuantity={setQuantity}
+            unit={unit}
+            setUnit={setUnit}
+            onSubmit={handleSubmit}
+            onCancel={onClose}
+          />
+        </div>
       </DialogContent>
     </Dialog>
+  );
+};
+
+interface QuantityFormProps {
+  quantity: string;
+  setQuantity: (value: string) => void;
+  unit: string;
+  setUnit: (value: string) => void;
+  onSubmit: (e: React.FormEvent) => void;
+  onCancel: () => void;
+}
+
+const QuantityForm: React.FC<QuantityFormProps> = ({
+  quantity,
+  setQuantity,
+  unit,
+  setUnit,
+  onSubmit,
+  onCancel
+}) => {
+  return (
+    <form onSubmit={onSubmit} className="grid gap-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="quantity">Quantité</Label>
+          <Input
+            id="quantity"
+            type="number"
+            min="0"
+            step="any"
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
+            className="col-span-3"
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="unit">Unité</Label>
+          <Select value={unit} onValueChange={setUnit}>
+            <SelectTrigger id="unit">
+              <SelectValue placeholder="Unité" />
+            </SelectTrigger>
+            <SelectContent>
+              {UNITS.map(unit => (
+                <SelectItem key={unit} value={unit}>
+                  {unit}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      
+      <DialogFooter className="mt-4">
+        <Button variant="outline" type="button" onClick={onCancel}>
+          Annuler
+        </Button>
+        <Button type="submit">
+          Ajouter
+        </Button>
+      </DialogFooter>
+    </form>
   );
 };
 
