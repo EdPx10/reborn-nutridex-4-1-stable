@@ -69,19 +69,15 @@ export const ConsumedFoodItem: React.FC<ConsumedFoodItemProps> = ({ item, onRemo
           </div>
         </div>
         
-        <div className="flex flex-wrap gap-1 mt-2">
-          {food.healthBenefits.slice(0, 2).map((benefit) => (
+        <div className="flex flex-wrap gap-2 mt-2">
+          {food.healthBenefits.map((benefit) => (
             <NutrientBadge 
               key={benefit} 
               type={benefit} 
-              showName={false} 
+              showName={true} 
+              className="text-xs py-1 px-2"
             />
           ))}
-          {food.healthBenefits.length > 2 && (
-            <span className="text-xs px-1.5 py-0.5 rounded-full bg-gray-100">
-              +{food.healthBenefits.length - 2}
-            </span>
-          )}
         </div>
       </div>
     </div>
