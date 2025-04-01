@@ -1,17 +1,19 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Food } from '@/types';
 import { foodCategories } from '@/data/healthBenefits';
 import { useDailyPlateStore } from '@/store/dailyPlateStore';
 import { toast } from '@/hooks/use-toast';
 import { Plus, Check } from 'lucide-react';
+import AddToDailyPlateDialog from '@/components/ui/AddToDailyPlateDialog';
 
 interface FoodHeaderProps {
   food: Food;
 }
 
 export const FoodHeader: React.FC<FoodHeaderProps> = ({ food }) => {
-  const { getItem, addItem, removeItem } = useDailyPlateStore();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { getItem, removeItem } = useDailyPlateStore();
   const isInPlate = getItem(food.id) !== undefined;
   const categoryInfo = foodCategories.find(c => c.id === food.category);
   
@@ -23,16 +25,7 @@ export const FoodHeader: React.FC<FoodHeaderProps> = ({ food }) => {
         description: `${food.name} a été retiré de votre assiette du jour`,
       });
     } else {
-      addItem({
-        id: food.id,
-        food: food,
-        quantity: 1,
-        unit: food.portion.unit
-      });
-      toast({
-        title: "Aliment ajouté",
-        description: `${food.name} a été ajouté à votre assiette du jour`,
-      });
+      setIsDialogOpen(true);
     }
   };
   
@@ -55,33 +48,29 @@ export const FoodHeader: React.FC<FoodHeaderProps> = ({ food }) => {
             {categoryInfo?.name || food.category}
           </span>
         </div>
+        <button 
+          onClick={handleTogglePlate}
+          className={`absolute bottom-4 right-4 w-10 h-10 rounded-full flex items-center justify-center shadow-md
+            ${isInPlate ? 'bg-nutri-green text-white' : 'bg-white hover:bg-gray-50'}`}
+          aria-label={isInPlate ? "Retirer de mon assiette" : "Ajouter à mon assiette"}
+        >
+          {isInPlate ? (
+            <Check size={20} />
+          ) : (
+            <Plus size={20} className="text-nutri-green" />
+          )}
+        </button>
       </div>
       
       <div className="p-6">
-        <div className="flex justify-between items-start">
-          <h1 className="text-3xl font-bold">{food.name}</h1>
-          <button
-            onClick={handleTogglePlate}
-            className={`px-4 py-2 rounded-full flex items-center gap-2 ${
-              isInPlate 
-                ? 'bg-green-100 text-green-700' 
-                : 'bg-nutri-green text-white'
-            }`}
-          >
-            {isInPlate ? (
-              <>
-                <Check size={18} />
-                <span>Retiré</span>
-              </>
-            ) : (
-              <>
-                <Plus size={18} />
-                <span>Ajouter à mon assiette</span>
-              </>
-            )}
-          </button>
-        </div>
+        <h1 className="text-3xl font-bold">{food.name}</h1>
       </div>
+
+      <AddToDailyPlateDialog 
+        food={food}
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+      />
     </>
   );
 };
