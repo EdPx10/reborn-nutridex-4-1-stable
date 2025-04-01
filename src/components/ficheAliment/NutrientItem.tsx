@@ -23,7 +23,9 @@ export const NutrientItem: React.FC<NutrientItemProps> = ({
         <span className="text-sm font-medium">{label}</span>
         <div className="text-sm space-x-2">
           <span>{value.toFixed(1)} {unit}</span>
-          <span className="text-gray-500">({percentage.toFixed(0)}%)</span>
+          {percentage > 0 && (
+            <span className="text-gray-500">({percentage.toFixed(0)}%)</span>
+          )}
         </div>
       </div>
       <ProgressBar 
