@@ -7,28 +7,28 @@ interface NutrientItemProps {
   value: number;
   unit: string;
   color?: string;
+  percentage?: number;
 }
 
 export const NutrientItem: React.FC<NutrientItemProps> = ({ 
   label, 
   value, 
   unit, 
-  color = 'bg-blue-500' 
+  color = 'bg-blue-500',
+  percentage = 0
 }) => {
-  // For visual purposes, simulate a target value
-  const targetValue = value * 2;
-  
   return (
     <div>
       <div className="flex justify-between items-center mb-1">
         <span className="text-sm font-medium">{label}</span>
-        <span className="text-sm">
-          {value.toFixed(2)} {unit}
-        </span>
+        <div className="text-sm space-x-2">
+          <span>{value.toFixed(1)} {unit}</span>
+          <span className="text-gray-500">({percentage.toFixed(0)}%)</span>
+        </div>
       </div>
       <ProgressBar 
-        value={value} 
-        max={targetValue} 
+        value={percentage} 
+        max={100} 
         color={color}
       />
     </div>
