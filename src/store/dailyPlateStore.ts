@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import { Food } from '@/types';
 
 export type PlateItem = {
+  id: string;
   food: Food;
   quantity: number;
   unit: string;
@@ -11,7 +12,7 @@ export type PlateItem = {
 
 interface DailyPlateState {
   items: PlateItem[];
-  addItem: (food: Food, quantity: number, unit: string) => void;
+  addItem: (item: {id: string; food: Food; quantity: number; unit: string}) => void;
   removeItem: (foodId: string) => void;
   updateItem: (foodId: string, quantity: number, unit: string) => void;
   getItem: (foodId: string) => PlateItem | undefined;
@@ -21,18 +22,16 @@ interface DailyPlateState {
 export const useDailyPlateStore = create<DailyPlateState>((set, get) => ({
   items: [],
   
-  addItem: (food: Food, quantity: number, unit: string) => {
+  addItem: (item: {id: string; food: Food; quantity: number; unit: string}) => {
     set((state) => {
       // Check if food already exists in plate
-      const existingItemIndex = state.items.findIndex(item => item.food.id === food.id);
+      const existingItemIndex = state.items.findIndex(i => i.id === item.id);
       
       if (existingItemIndex >= 0) {
         // Replace existing item
         const updatedItems = [...state.items];
         updatedItems[existingItemIndex] = {
-          ...updatedItems[existingItemIndex],
-          quantity,
-          unit,
+          ...item,
           addedAt: new Date(),
         };
         return { items: updatedItems };
@@ -42,9 +41,7 @@ export const useDailyPlateStore = create<DailyPlateState>((set, get) => ({
           items: [
             ...state.items,
             {
-              food,
-              quantity,
-              unit,
+              ...item,
               addedAt: new Date(),
             },
           ],
@@ -55,20 +52,20 @@ export const useDailyPlateStore = create<DailyPlateState>((set, get) => ({
   
   removeItem: (foodId: string) => {
     set((state) => ({
-      items: state.items.filter((item) => item.food.id !== foodId),
+      items: state.items.filter((item) => item.id !== foodId),
     }));
   },
   
   updateItem: (foodId: string, quantity: number, unit: string) => {
     set((state) => ({
       items: state.items.map((item) =>
-        item.food.id === foodId ? { ...item, quantity, unit } : item
+        item.id === foodId ? { ...item, quantity, unit } : item
       ),
     }));
   },
   
   getItem: (foodId: string) => {
-    return get().items.find((item) => item.food.id === foodId);
+    return get().items.find((item) => item.id === foodId);
   },
   
   clearPlate: () => set({ items: [] }),

@@ -36,9 +36,9 @@ const FicheAliment: React.FC = () => {
     } else {
       addItem({
         id: food.id,
+        food: food,
         quantity: 1,
-        unit: food.portion.unit,
-        food: food
+        unit: food.portion.unit
       });
       toast({
         title: "Aliment ajouté",
