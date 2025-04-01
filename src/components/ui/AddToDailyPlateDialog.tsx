@@ -19,6 +19,10 @@ interface AddToDailyPlateDialogProps {
   food: Food;
   isOpen: boolean;
   onClose: () => void;
+  initialQuantity?: number;
+  initialUnit?: string;
+  editMode?: boolean;
+  onConfirm?: (quantity: number, unit: string) => void;
 }
 
 const UNITS = ["g", "ml", "c.à.café", "c.à.soupe"];
@@ -27,9 +31,13 @@ export const AddToDailyPlateDialog: React.FC<AddToDailyPlateDialogProps> = ({
   food, 
   isOpen, 
   onClose,
+  initialQuantity = 100,
+  initialUnit = UNITS[0],
+  editMode = false,
+  onConfirm
 }) => {
-  const [quantity, setQuantity] = useState("100");
-  const [unit, setUnit] = useState(UNITS[0]);
+  const [quantity, setQuantity] = useState(initialQuantity.toString());
+  const [unit, setUnit] = useState(initialUnit);
   const { addItem } = useDailyPlateStore();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -45,17 +53,21 @@ export const AddToDailyPlateDialog: React.FC<AddToDailyPlateDialogProps> = ({
       return;
     }
 
-    addItem({
-      id: food.id,
-      food,
-      quantity: numericQuantity,
-      unit
-    });
-    
-    toast({
-      title: "Aliment ajouté",
-      description: `${food.name} a été ajouté à votre assiette du jour`,
-    });
+    if (editMode && onConfirm) {
+      onConfirm(numericQuantity, unit);
+    } else {
+      addItem({
+        id: food.id,
+        food,
+        quantity: numericQuantity,
+        unit
+      });
+      
+      toast({
+        title: "Aliment ajouté",
+        description: `${food.name} a été ajouté à votre assiette du jour`,
+      });
+    }
     
     onClose();
   };
@@ -64,7 +76,12 @@ export const AddToDailyPlateDialog: React.FC<AddToDailyPlateDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Ajouter {food.name} à mon assiette</DialogTitle>
+          <DialogTitle>
+            {editMode 
+              ? `Modifier la quantité de ${food.name}` 
+              : `Ajouter ${food.name} à mon assiette`
+            }
+          </DialogTitle>
         </DialogHeader>
         
         <div className="py-4">
@@ -75,6 +92,7 @@ export const AddToDailyPlateDialog: React.FC<AddToDailyPlateDialogProps> = ({
             setUnit={setUnit}
             onSubmit={handleSubmit}
             onCancel={onClose}
+            confirmLabel={editMode ? "Modifier" : "Ajouter"}
           />
         </div>
       </DialogContent>
@@ -89,6 +107,7 @@ interface QuantityFormProps {
   setUnit: (value: string) => void;
   onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
+  confirmLabel?: string;
 }
 
 const QuantityForm: React.FC<QuantityFormProps> = ({
@@ -97,7 +116,8 @@ const QuantityForm: React.FC<QuantityFormProps> = ({
   unit,
   setUnit,
   onSubmit,
-  onCancel
+  onCancel,
+  confirmLabel = "Ajouter"
 }) => {
   return (
     <form onSubmit={onSubmit} className="grid gap-4">
@@ -137,7 +157,7 @@ const QuantityForm: React.FC<QuantityFormProps> = ({
           Annuler
         </Button>
         <Button type="submit">
-          Ajouter
+          {confirmLabel}
         </Button>
       </DialogFooter>
     </form>
