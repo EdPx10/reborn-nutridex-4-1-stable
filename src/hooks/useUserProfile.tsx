@@ -25,6 +25,11 @@ const DEFAULT_PROFILE: UserProfile = {
       fer: { current: 0, goal: 8, unit: 'mg' },
       magnesium: { current: 0, goal: 420, unit: 'mg' },
     },
+    oligoelements: {
+      zinc: { current: 0, goal: 11, unit: 'mg' },
+      selenium: { current: 0, goal: 55, unit: 'µg' },
+      iode: { current: 0, goal: 150, unit: 'µg' },
+    }
   },
   isActive: true,
 };

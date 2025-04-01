@@ -11,13 +11,11 @@ export const MicroNutrients: React.FC<MicroNutrientsProps> = ({ food }) => {
   // Format labels for vitamins and minerals
   const formatVitaminLabel = (key: string) => `Vitamine ${key.toUpperCase()}`;
   const formatMineralLabel = (key: string) => key.charAt(0).toUpperCase() + key.slice(1);
+  const formatOligoLabel = (key: string) => key.charAt(0).toUpperCase() + key.slice(1);
   
   const hasVitamins = food.nutrients.vitamines && Object.keys(food.nutrients.vitamines).length > 0;
   const hasMinerals = food.nutrients.mineraux && Object.keys(food.nutrients.mineraux).length > 0;
-  
-  // We'll eventually use these for trace elements (oligoéléments)
-  const hasOligoelements = false; // Placeholder for future implementation
-  const oligoelements = {}; // Placeholder for future implementation
+  const hasOligoelements = food.nutrients.oligoelements && Object.keys(food.nutrients.oligoelements).length > 0;
   
   if (!hasVitamins && !hasMinerals && !hasOligoelements) {
     return null;
@@ -50,9 +48,10 @@ export const MicroNutrients: React.FC<MicroNutrientsProps> = ({ food }) => {
       {hasOligoelements && (
         <NutrientSection
           title="Oligo-éléments"
-          nutrients={oligoelements}
+          nutrients={food.nutrients.oligoelements || {}}
           unit="μg"
           color="bg-nutri-blue"
+          labelFormatter={formatOligoLabel}
           calculateProportions={true}
         />
       )}

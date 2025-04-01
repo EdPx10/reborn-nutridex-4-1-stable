@@ -22,6 +22,9 @@ export interface Food {
     mineraux?: {
       [key: string]: number;
     };
+    oligoelements?: {
+      [key: string]: number;
+    };
   };
   healthBenefits: HealthBenefit[];
   seasons?: Season[];
@@ -73,6 +76,9 @@ export interface UserProfile {
       [key: string]: NutrientGoal;
     };
     mineraux: {
+      [key: string]: NutrientGoal;
+    };
+    oligoelements: {
       [key: string]: NutrientGoal;
     };
   };

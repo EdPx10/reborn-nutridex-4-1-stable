@@ -40,9 +40,23 @@ const MicroNutrientSection: React.FC<MicroNutrientSectionProps> = ({ profile }) 
       </Accordion>
       
       <Accordion title="Oligo-éléments">
-        <p className="text-gray-500 italic">
-          Aucun objectif défini pour les oligo-éléments
-        </p>
+        {profile.goals.oligoelements && Object.keys(profile.goals.oligoelements).length > 0 ? (
+          <div className="space-y-6 pt-2">
+            {Object.entries(profile.goals.oligoelements).map(([key, goal]) => (
+              <MicroNutrient
+                key={key}
+                label={key.charAt(0).toUpperCase() + key.slice(1)}
+                category="oligoelements"
+                nutrientKey={key}
+                goal={goal}
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-500 italic">
+            Aucun objectif défini pour les oligo-éléments
+          </p>
+        )}
       </Accordion>
     </div>
   );

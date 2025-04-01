@@ -12,6 +12,9 @@ interface MicronutrientTabProps {
     mineraux: {
       [key: string]: number;
     };
+    oligoelements?: {
+      [key: string]: number;
+    };
   };
   activeProfile: {
     goals: {
@@ -19,6 +22,9 @@ interface MicronutrientTabProps {
         [key: string]: { goal: number; unit: string };
       };
       mineraux: {
+        [key: string]: { goal: number; unit: string };
+      };
+      oligoelements?: {
         [key: string]: { goal: number; unit: string };
       };
     };
@@ -72,6 +78,35 @@ export const MicronutrientTab: React.FC<MicronutrientTabProps> = ({
             );
           })}
         </div>
+      </Accordion>
+      
+      <Accordion title="Oligo-éléments">
+        {totalNutrients.oligoelements && activeProfile.goals.oligoelements && 
+         Object.keys(totalNutrients.oligoelements).length > 0 ? (
+          <div className="space-y-6 pt-2">
+            {Object.entries(totalNutrients.oligoelements).map(([key, value]) => {
+              const oligoGoal = activeProfile.goals.oligoelements?.[key];
+              if (!oligoGoal) return null;
+              
+              return (
+                <div key={key} className="flex items-center gap-2">
+                  {getNutrientIcon('oligoelements', key, 16)}
+                  <MicroNutrientProgress
+                    key={key}
+                    label={key.charAt(0).toUpperCase() + key.slice(1)}
+                    current={value}
+                    goal={oligoGoal.goal}
+                    unit={oligoGoal.unit}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="text-gray-500 italic pt-2">
+            Aucun objectif défini pour les oligo-éléments
+          </p>
+        )}
       </Accordion>
     </div>
   );
