@@ -50,42 +50,38 @@ const MacroNutrientSection: React.FC<MacroNutrientSectionProps> = ({ profile }) 
               indent={true}
             />
             
-            <Accordion title="Acides gras poly-insaturés" nestedAccordion={true}>
-              <MacroNutrient
-                label="Acides gras poly-insaturés (Total)"
-                nutrientKey="lipides"
-                goal={profile.goals.lipides}
-                subGoalPercentage={0.33}
-                showIcon={false}
-                indent={true}
-              />
-              
-              <div className="space-y-6 mt-6">
-                <MacroNutrient
-                  label="Oméga-3"
-                  nutrientKey="lipides"
-                  goal={{
-                    current: profile.goals.lipides.current * 0.05,
-                    goal: 2,
-                    unit: 'g'
-                  }}
-                  showIcon={false}
-                  indent={true}
-                />
-                
-                <MacroNutrient
-                  label="Oméga-6"
-                  nutrientKey="lipides"
-                  goal={{
-                    current: profile.goals.lipides.current * 0.1,
-                    goal: 10,
-                    unit: 'g'
-                  }}
-                  showIcon={false}
-                  indent={true}
-                />
-              </div>
-            </Accordion>
+            <MacroNutrient
+              label="Acides gras poly-insaturés (Total)"
+              nutrientKey="lipides"
+              goal={profile.goals.lipides}
+              subGoalPercentage={0.33}
+              showIcon={false}
+              indent={true}
+            />
+            
+            <MacroNutrient
+              label="Oméga-3"
+              nutrientKey="lipides"
+              goal={{
+                current: profile.goals.lipides.current * 0.05,
+                goal: 2,
+                unit: 'g'
+              }}
+              showIcon={false}
+              indent={true}
+            />
+            
+            <MacroNutrient
+              label="Oméga-6"
+              nutrientKey="lipides"
+              goal={{
+                current: profile.goals.lipides.current * 0.1,
+                goal: 10,
+                unit: 'g'
+              }}
+              showIcon={false}
+              indent={true}
+            />
           </div>
         </Accordion>
       </div>

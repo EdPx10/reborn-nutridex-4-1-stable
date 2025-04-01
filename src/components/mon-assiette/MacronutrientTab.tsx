@@ -33,7 +33,6 @@ export const MacronutrientTab: React.FC<MacronutrientTabProps> = ({
   activeProfile 
 }) => {
   const [lipidsExpanded, setLipidsExpanded] = useState(false);
-  const [polyUnsaturatedExpanded, setPolyUnsaturatedExpanded] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -100,46 +99,32 @@ export const MacronutrientTab: React.FC<MacronutrientTabProps> = ({
               indent={true}
             />
             
-            <div className="border-t border-b border-gray-50 py-2 ml-6">
-              <button 
-                className="flex justify-between items-center w-full py-2 text-left"
-                onClick={() => setPolyUnsaturatedExpanded(!polyUnsaturatedExpanded)}
-              >
-                <span>Acides gras poly-insaturés</span>
-                {polyUnsaturatedExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-              </button>
-              
-              {polyUnsaturatedExpanded ? (
-                <div className="pt-2 pb-3 space-y-6">
-                  <NutrientProgress
-                    label="Acides gras poly-insaturés (Total)"
-                    current={totalNutrients.lipids.polyUnsaturated}
-                    goal={activeProfile.goals.lipides.goal * 0.33} // Approximation
-                    unit="g"
-                    color="bg-nutri-yellow"
-                    indent={true}
-                  />
-                  
-                  <NutrientProgress
-                    label="Oméga-3"
-                    current={totalNutrients.lipids.omega3}
-                    goal={2} // Recommandation générale
-                    unit="g"
-                    color="bg-nutri-yellow"
-                    indent={true}
-                  />
-                  
-                  <NutrientProgress
-                    label="Oméga-6"
-                    current={totalNutrients.lipids.omega6}
-                    goal={10} // Recommandation générale
-                    unit="g"
-                    color="bg-nutri-yellow"
-                    indent={true}
-                  />
-                </div>
-              ) : null}
-            </div>
+            <NutrientProgress
+              label="Acides gras poly-insaturés (Total)"
+              current={totalNutrients.lipids.polyUnsaturated}
+              goal={activeProfile.goals.lipides.goal * 0.33} // Approximation
+              unit="g"
+              color="bg-nutri-yellow"
+              indent={true}
+            />
+            
+            <NutrientProgress
+              label="Oméga-3"
+              current={totalNutrients.lipids.omega3}
+              goal={2} // Recommandation générale
+              unit="g"
+              color="bg-nutri-yellow"
+              indent={true}
+            />
+            
+            <NutrientProgress
+              label="Oméga-6"
+              current={totalNutrients.lipids.omega6}
+              goal={10} // Recommandation générale
+              unit="g"
+              color="bg-nutri-yellow"
+              indent={true}
+            />
           </div>
         )}
       </div>
