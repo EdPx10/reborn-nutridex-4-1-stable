@@ -1,10 +1,12 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, UtensilsCrossed, User, Search } from 'lucide-react';
+import SearchDialog from '@/components/ui/SearchDialog';
 
 const Header: React.FC = () => {
   const location = useLocation();
+  const [searchOpen, setSearchOpen] = useState(false);
   
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -30,7 +32,11 @@ const Header: React.FC = () => {
             </NavLink>
           </div>
           
-          <button className="md:hidden p-2">
+          <button 
+            className="p-2 rounded-md hover:bg-gray-100 transition-colors"
+            onClick={() => setSearchOpen(true)}
+            aria-label="Rechercher un aliment"
+          >
             <Search size={20} />
           </button>
         </div>
@@ -44,6 +50,12 @@ const Header: React.FC = () => {
           <NavButton to="/profil" active={isActive('/profil')} icon={<User size={20} />} label="Profil" />
         </div>
       </nav>
+
+      {/* Search Dialog */}
+      <SearchDialog 
+        isOpen={searchOpen} 
+        onClose={() => setSearchOpen(false)} 
+      />
     </header>
   );
 };
