@@ -45,7 +45,12 @@ export const AddToDailyPlateDialog: React.FC<AddToDailyPlateDialogProps> = ({
       return;
     }
 
-    addItem(food, numericQuantity, unit);
+    addItem({
+      id: food.id,
+      food,
+      quantity: numericQuantity,
+      unit
+    });
     
     toast({
       title: "Aliment ajouté",
