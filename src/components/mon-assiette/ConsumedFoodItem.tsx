@@ -1,18 +1,21 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Trash2 } from 'lucide-react';
 import { NutrientBadge } from '@/components/ui/NutrientBadge';
 import { foodCategories } from '@/data/healthBenefits';
 import { PlateItem } from '@/store/dailyPlateStore';
+import AddToDailyPlateDialog from '@/components/ui/AddToDailyPlateDialog';
 
 interface ConsumedFoodItemProps {
   item: PlateItem;
   onRemove: () => void;
+  onUpdate: (quantity: number, unit: string) => void;
 }
 
-export const ConsumedFoodItem: React.FC<ConsumedFoodItemProps> = ({ item, onRemove }) => {
+export const ConsumedFoodItem: React.FC<ConsumedFoodItemProps> = ({ item, onRemove, onUpdate }) => {
   const { food, quantity, unit } = item;
   const categoryInfo = foodCategories.find(c => c.id === food.category);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   
   // Calculate the nutrients based on the quantity
   const factor = quantity / food.portion.amount;
@@ -20,6 +23,15 @@ export const ConsumedFoodItem: React.FC<ConsumedFoodItemProps> = ({ item, onRemo
     glucides: Math.round(food.nutrients.glucides * factor * 100) / 100,
     proteines: Math.round(food.nutrients.proteines * factor * 100) / 100,
     lipides: Math.round(food.nutrients.lipides * factor * 100) / 100,
+  };
+
+  const handleDialogClose = () => {
+    setIsDialogOpen(false);
+  };
+
+  const handleQuantityUpdate = (newQuantity: number, newUnit: string) => {
+    onUpdate(newQuantity, newUnit);
+    setIsDialogOpen(false);
   };
   
   return (
@@ -44,14 +56,19 @@ export const ConsumedFoodItem: React.FC<ConsumedFoodItemProps> = ({ item, onRemo
               <span className={`text-xs px-2 py-0.5 rounded-full ${categoryInfo?.color || 'bg-gray-100'}`}>
                 {categoryInfo?.name || food.category}
               </span>
-              <span className="text-xs text-gray-500">
-                {quantity} {unit}
-              </span>
             </div>
           </div>
-          <button onClick={onRemove} className="p-1 text-gray-400 hover:text-red-500">
-            <Trash2 size={16} />
-          </button>
+          <div className="flex items-center">
+            <button 
+              onClick={() => setIsDialogOpen(true)} 
+              className="mr-2 px-2 py-1 bg-gray-100 rounded-full text-xs font-medium hover:bg-gray-200 transition-colors"
+            >
+              {quantity} {unit}
+            </button>
+            <button onClick={onRemove} className="p-1 text-gray-400 hover:text-red-500">
+              <Trash2 size={16} />
+            </button>
+          </div>
         </div>
         
         <div className="grid grid-cols-3 gap-2 mt-2 text-xs">
@@ -80,6 +97,16 @@ export const ConsumedFoodItem: React.FC<ConsumedFoodItemProps> = ({ item, onRemo
           ))}
         </div>
       </div>
+
+      <AddToDailyPlateDialog 
+        food={food}
+        isOpen={isDialogOpen}
+        onClose={handleDialogClose}
+        initialQuantity={quantity}
+        initialUnit={unit}
+        editMode={true}
+        onConfirm={handleQuantityUpdate}
+      />
     </div>
   );
 };

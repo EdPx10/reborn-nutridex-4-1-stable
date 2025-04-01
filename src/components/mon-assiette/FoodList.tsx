@@ -6,9 +6,10 @@ import ConsumedFoodItem from './ConsumedFoodItem';
 interface FoodListProps {
   items: PlateItem[];
   onRemoveItem: (foodId: string) => void;
+  onUpdateItem: (foodId: string, quantity: number, unit: string) => void;
 }
 
-export const FoodList: React.FC<FoodListProps> = ({ items, onRemoveItem }) => {
+export const FoodList: React.FC<FoodListProps> = ({ items, onRemoveItem, onUpdateItem }) => {
   if (items.length === 0) {
     return (
       <div className="text-center py-10 bg-white rounded-lg border border-gray-100">
@@ -27,6 +28,7 @@ export const FoodList: React.FC<FoodListProps> = ({ items, onRemoveItem }) => {
           key={`${item.food.id}-${item.addedAt.toISOString()}`}
           item={item}
           onRemove={() => onRemoveItem(item.food.id)}
+          onUpdate={(quantity, unit) => onUpdateItem(item.food.id, quantity, unit)}
         />
       ))}
     </div>

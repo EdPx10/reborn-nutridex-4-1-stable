@@ -10,7 +10,7 @@ import { calculateTotalNutrients } from '@/components/mon-assiette/NutrientCalcu
 const MonAssiette: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const { activeProfile } = useUserProfile();
-  const { items, removeItem, clearPlate } = useDailyPlateStore();
+  const { items, removeItem, clearPlate, updateItem } = useDailyPlateStore();
   
   // Calculate total nutrients using the utility function
   const totalNutrients = calculateTotalNutrients(items);
@@ -36,7 +36,11 @@ const MonAssiette: React.FC = () => {
         {/* List of consumed foods */}
         <div>
           <h2 className="text-xl font-medium mb-4">Aliments consommés ({items.length})</h2>
-          <FoodList items={items} onRemoveItem={removeItem} />
+          <FoodList 
+            items={items} 
+            onRemoveItem={removeItem} 
+            onUpdateItem={updateItem}
+          />
         </div>
         
         {/* Nutrition charts and summaries */}
