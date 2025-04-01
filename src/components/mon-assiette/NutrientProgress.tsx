@@ -26,7 +26,7 @@ export const NutrientProgress: React.FC<NutrientProgressProps> = ({
       <div className="flex justify-between items-center mb-1">
         <span className="font-medium">{label}</span>
         <span>
-          {current.toFixed(1)}/{goal} {unit}
+          {current.toFixed(2)}/{goal.toFixed(2)} {unit}
         </span>
       </div>
       <ProgressBar 
@@ -36,7 +36,7 @@ export const NutrientProgress: React.FC<NutrientProgressProps> = ({
         height="h-3"
       />
       <div className="text-right text-sm text-gray-500 mt-1">
-        {percentage}% {goal > current ? `(Recommandation: ${goal} ${unit})` : '(Objectif atteint)'}
+        {percentage}% {goal > current ? `(Recommandation: ${goal.toFixed(2)} ${unit})` : '(Objectif atteint)'}
       </div>
     </div>
   );

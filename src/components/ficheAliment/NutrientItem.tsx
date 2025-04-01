@@ -23,7 +23,7 @@ export const NutrientItem: React.FC<NutrientItemProps> = ({
       <div className="flex justify-between items-center mb-1">
         <span className="text-sm font-medium">{label}</span>
         <span className="text-sm">
-          {value} {unit}
+          {value.toFixed(2)} {unit}
         </span>
       </div>
       <ProgressBar 

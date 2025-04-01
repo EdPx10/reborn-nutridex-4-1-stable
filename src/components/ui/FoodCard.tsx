@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Food } from '@/types';
 import { foodCategories, healthBenefitsInfo, seasons } from '@/data/healthBenefits';
@@ -100,15 +101,15 @@ export const FoodCard: React.FC<FoodCardProps> = ({ food }) => {
             <div className="grid grid-cols-3 gap-2 my-2 text-sm">
               <div>
                 <p className="text-gray-500">Glucides</p>
-                <p className="font-medium">{nutrients.glucides}g</p>
+                <p className="font-medium">{nutrients.glucides.toFixed(2)}g</p>
               </div>
               <div>
                 <p className="text-gray-500">Protéines</p>
-                <p className="font-medium">{nutrients.proteines}g</p>
+                <p className="font-medium">{nutrients.proteines.toFixed(2)}g</p>
               </div>
               <div>
                 <p className="text-gray-500">Lipides</p>
-                <p className="font-medium">{nutrients.lipides}g</p>
+                <p className="font-medium">{nutrients.lipides.toFixed(2)}g</p>
               </div>
             </div>
             

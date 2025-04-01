@@ -17,9 +17,9 @@ export const ConsumedFoodItem: React.FC<ConsumedFoodItemProps> = ({ item, onRemo
   // Calculate the nutrients based on the quantity
   const factor = quantity / food.portion.amount;
   const calculatedNutrients = {
-    glucides: Math.round(food.nutrients.glucides * factor * 10) / 10,
-    proteines: Math.round(food.nutrients.proteines * factor * 10) / 10,
-    lipides: Math.round(food.nutrients.lipides * factor * 10) / 10,
+    glucides: Math.round(food.nutrients.glucides * factor * 100) / 100,
+    proteines: Math.round(food.nutrients.proteines * factor * 100) / 100,
+    lipides: Math.round(food.nutrients.lipides * factor * 100) / 100,
   };
   
   return (
@@ -57,15 +57,15 @@ export const ConsumedFoodItem: React.FC<ConsumedFoodItemProps> = ({ item, onRemo
         <div className="grid grid-cols-3 gap-2 mt-2 text-xs">
           <div>
             <p className="text-gray-500">Glucides</p>
-            <p className="font-medium">{calculatedNutrients.glucides}g</p>
+            <p className="font-medium">{calculatedNutrients.glucides.toFixed(2)}g</p>
           </div>
           <div>
             <p className="text-gray-500">Protéines</p>
-            <p className="font-medium">{calculatedNutrients.proteines}g</p>
+            <p className="font-medium">{calculatedNutrients.proteines.toFixed(2)}g</p>
           </div>
           <div>
             <p className="text-gray-500">Lipides</p>
-            <p className="font-medium">{calculatedNutrients.lipides}g</p>
+            <p className="font-medium">{calculatedNutrients.lipides.toFixed(2)}g</p>
           </div>
         </div>
         
