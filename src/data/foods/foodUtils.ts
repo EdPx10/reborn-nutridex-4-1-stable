@@ -16,8 +16,9 @@ export const getFilteredFoods = (
     const matchesBenefit = !benefit || 
       food.healthBenefits.includes(benefit as any);
     
+    // Correction du filtre par saison
     const matchesSeason = !season || 
-      food.seasons?.includes(season as any);
+      (food.seasons && food.seasons.includes(season as any));
     
     return matchesSearch && matchesCategory && matchesBenefit && matchesSeason;
   });

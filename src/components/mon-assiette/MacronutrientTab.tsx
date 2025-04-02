@@ -34,6 +34,11 @@ export const MacronutrientTab: React.FC<MacronutrientTabProps> = ({
 }) => {
   const [lipidsExpanded, setLipidsExpanded] = useState(false);
 
+  // Vérification que les données des lipides sont cohérentes
+  const totalPolyUnsaturated = totalNutrients.lipids?.polyUnsaturated || 0;
+  const omega3 = totalNutrients.lipids?.omega3 || 0;
+  const omega6 = totalNutrients.lipids?.omega6 || 0;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
@@ -101,7 +106,7 @@ export const MacronutrientTab: React.FC<MacronutrientTabProps> = ({
             
             <NutrientProgress
               label="Acides gras poly-insaturés (Total)"
-              current={totalNutrients.lipids.polyUnsaturated}
+              current={totalPolyUnsaturated}
               goal={activeProfile.goals.lipides.goal * 0.33} // Approximation
               unit="g"
               color="bg-nutri-yellow"
@@ -111,7 +116,7 @@ export const MacronutrientTab: React.FC<MacronutrientTabProps> = ({
             <div className="ml-6">
               <NutrientProgress
                 label="Oméga-3"
-                current={totalNutrients.lipids.omega3}
+                current={omega3}
                 goal={2} // Recommandation générale
                 unit="g"
                 color="bg-nutri-yellow"
@@ -120,7 +125,7 @@ export const MacronutrientTab: React.FC<MacronutrientTabProps> = ({
               
               <NutrientProgress
                 label="Oméga-6"
-                current={totalNutrients.lipids.omega6}
+                current={omega6}
                 goal={10} // Recommandation générale
                 unit="g"
                 color="bg-nutri-yellow"

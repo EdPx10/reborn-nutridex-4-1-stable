@@ -25,6 +25,7 @@ const Explorateur: React.FC = () => {
   const isMobile = useIsMobile();
   
   useEffect(() => {
+    // Appliquer correctement les filtres via la fonction getFilteredFoods
     const filtered = getFilteredFoods(searchTerm, selectedCategory, selectedBenefit, selectedSeason);
     setFoods(filtered);
   }, [searchTerm, selectedCategory, selectedBenefit, selectedSeason]);

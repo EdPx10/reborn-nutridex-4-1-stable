@@ -31,21 +31,21 @@ export const calculateTotalNutrients = (items: FoodWithQuantity[]) => {
     const portionRatio = quantity / food.portion.amount;
     
     // Macronutriments
-    totalNutrients.glucides += (food.nutrients.glucides * portionRatio);
-    totalNutrients.proteines += (food.nutrients.proteines * portionRatio);
-    totalNutrients.lipides += (food.nutrients.lipides * portionRatio);
+    totalNutrients.glucides += (food.nutrients.glucides * portionRatio) || 0;
+    totalNutrients.proteines += (food.nutrients.proteines * portionRatio) || 0;
+    totalNutrients.lipides += (food.nutrients.lipides * portionRatio) || 0;
     
     if (food.nutrients.fibres) {
-      totalNutrients.fibres += (food.nutrients.fibres * portionRatio);
+      totalNutrients.fibres += (food.nutrients.fibres * portionRatio) || 0;
     }
     
     // Détails des lipides
     if (food.nutrients.lipids) {
-      totalNutrients.lipids.saturated += (food.nutrients.lipids.saturated * portionRatio) || 0;
-      totalNutrients.lipids.monoUnsaturated += (food.nutrients.lipids.monoUnsaturated * portionRatio) || 0;
-      totalNutrients.lipids.polyUnsaturated += (food.nutrients.lipids.polyUnsaturated * portionRatio) || 0;
-      totalNutrients.lipids.omega3 += (food.nutrients.lipids.omega3 * portionRatio) || 0;
-      totalNutrients.lipids.omega6 += (food.nutrients.lipids.omega6 * portionRatio) || 0;
+      totalNutrients.lipids.saturated += (food.nutrients.lipids.saturated || 0) * portionRatio;
+      totalNutrients.lipids.monoUnsaturated += (food.nutrients.lipids.monoUnsaturated || 0) * portionRatio;
+      totalNutrients.lipids.polyUnsaturated += (food.nutrients.lipids.polyUnsaturated || 0) * portionRatio;
+      totalNutrients.lipids.omega3 += (food.nutrients.lipids.omega3 || 0) * portionRatio;
+      totalNutrients.lipids.omega6 += (food.nutrients.lipids.omega6 || 0) * portionRatio;
     }
     
     // Vitamines
@@ -54,7 +54,7 @@ export const calculateTotalNutrients = (items: FoodWithQuantity[]) => {
         if (!totalNutrients.vitamines[key]) {
           totalNutrients.vitamines[key] = 0;
         }
-        totalNutrients.vitamines[key] += (value * portionRatio);
+        totalNutrients.vitamines[key] += (value * portionRatio) || 0;
       });
     }
     
@@ -64,7 +64,7 @@ export const calculateTotalNutrients = (items: FoodWithQuantity[]) => {
         if (!totalNutrients.mineraux[key]) {
           totalNutrients.mineraux[key] = 0;
         }
-        totalNutrients.mineraux[key] += (value * portionRatio);
+        totalNutrients.mineraux[key] += (value * portionRatio) || 0;
       });
     }
     
@@ -74,7 +74,7 @@ export const calculateTotalNutrients = (items: FoodWithQuantity[]) => {
         if (!totalNutrients.oligoelements[key]) {
           totalNutrients.oligoelements[key] = 0;
         }
-        totalNutrients.oligoelements[key] += (value * portionRatio);
+        totalNutrients.oligoelements[key] += (value * portionRatio) || 0;
       });
     }
   });

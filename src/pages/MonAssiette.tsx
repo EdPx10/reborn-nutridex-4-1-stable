@@ -18,17 +18,20 @@ const MonAssiette: React.FC = () => {
   // Synchroniser les apports nutritionnels avec le profil utilisateur
   useEffect(() => {
     if (activeProfile) {
-      updateNutrientIntake({
+      // Créer une copie des nutriments pour éviter les mises à jour en boucle
+      const nutrientsSnapshot = {
         glucides: totalNutrients.glucides,
         proteines: totalNutrients.proteines,
         lipides: totalNutrients.lipides,
         fibres: totalNutrients.fibres,
-        vitamines: totalNutrients.vitamines,
-        mineraux: totalNutrients.mineraux,
-        oligoelements: totalNutrients.oligoelements
-      });
+        vitamines: { ...totalNutrients.vitamines },
+        mineraux: { ...totalNutrients.mineraux },
+        oligoelements: { ...totalNutrients.oligoelements }
+      };
+      
+      updateNutrientIntake(nutrientsSnapshot);
     }
-  }, [totalNutrients, activeProfile, updateNutrientIntake]);
+  }, [items, activeProfile]); // Dépendance uniquement sur items et activeProfile
   
   return (
     <div className="animate-fade-in">
