@@ -16,7 +16,7 @@ export const getFilteredFoods = (
     const matchesBenefit = !benefit || 
       food.healthBenefits.includes(benefit as any);
     
-    // Correction du filtre par saison
+    // Fixed season filtering logic
     const matchesSeason = !season || 
       (food.seasons && food.seasons.includes(season as any));
     

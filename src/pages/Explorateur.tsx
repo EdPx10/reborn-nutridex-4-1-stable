@@ -25,7 +25,7 @@ const Explorateur: React.FC = () => {
   const isMobile = useIsMobile();
   
   useEffect(() => {
-    // Appliquer correctement les filtres via la fonction getFilteredFoods
+    // Reset foods array when filters change to prevent stale data
     const filtered = getFilteredFoods(searchTerm, selectedCategory, selectedBenefit, selectedSeason);
     setFoods(filtered);
   }, [searchTerm, selectedCategory, selectedBenefit, selectedSeason]);
@@ -70,6 +70,7 @@ const Explorateur: React.FC = () => {
   };
 
   const toggleSeason = (seasonId: string) => {
+    // Clear previous season selection completely before setting new one
     if (selectedSeason === seasonId) {
       setSelectedSeason(undefined);
     } else {
