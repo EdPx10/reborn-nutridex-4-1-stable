@@ -37,11 +37,7 @@ export const FoodCard: React.FC<FoodCardProps> = ({ food }) => {
     }
   };
   
-  const currentSeason = foodSeasons && foodSeasons.length > 0 ? foodSeasons[0] : null;
-  
-  const getSeasonIcon = (season: string | null) => {
-    if (!season) return null;
-    
+  const getSeasonIcon = (season: string) => {
     switch (season) {
       case 'printemps':
         return <Leaf size={18} className="text-nutri-green" />;
@@ -77,9 +73,13 @@ export const FoodCard: React.FC<FoodCardProps> = ({ food }) => {
                 {categoryInfo?.name || category}
               </span>
             </div>
-            {currentSeason && (
-              <div className="absolute top-2 right-2 bg-white rounded-full p-1.5 shadow-sm">
-                {getSeasonIcon(currentSeason)}
+            {foodSeasons && foodSeasons.length > 0 && (
+              <div className="absolute top-2 right-2 bg-white rounded-full p-1.5 shadow-sm flex gap-1">
+                {foodSeasons.map((season, index) => (
+                  <div key={`${season}-${index}`}>
+                    {getSeasonIcon(season)}
+                  </div>
+                ))}
               </div>
             )}
             <button 
