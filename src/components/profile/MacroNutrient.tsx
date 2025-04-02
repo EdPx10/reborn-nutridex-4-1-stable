@@ -13,6 +13,11 @@ interface MacroNutrientProps {
   subGoalPercentage?: number;
 }
 
+// Helper function to format numbers to 1 decimal place if needed
+const formatValue = (value: number): string => {
+  return Number.isInteger(value) ? value.toString() : value.toFixed(1);
+};
+
 const MacroNutrient: React.FC<MacroNutrientProps> = ({ 
   label, 
   nutrientKey,
@@ -59,8 +64,8 @@ const MacroNutrient: React.FC<MacroNutrientProps> = ({
       <div className="flex justify-between mt-1 text-sm text-gray-600">
         <div>{percentage}% de l'objectif</div>
         <div>
-          {adjustedGoal.current.toFixed(2)} / {adjustedGoal.goal.toFixed(2)} {adjustedGoal.unit} 
-          {adjustedGoal.recommended && ` (recommandé: ${adjustedGoal.recommended.toFixed(2)} ${adjustedGoal.unit})`}
+          {formatValue(adjustedGoal.current)} / {formatValue(adjustedGoal.goal)} {adjustedGoal.unit} 
+          {adjustedGoal.recommended && ` (recommandé: ${formatValue(adjustedGoal.recommended)} ${adjustedGoal.unit})`}
         </div>
       </div>
     </div>

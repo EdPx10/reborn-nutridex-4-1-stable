@@ -39,7 +39,7 @@ export const calculateTotalNutrients = (items: FoodWithQuantity[]) => {
       totalNutrients.fibres += (food.nutrients.fibres * portionRatio) || 0;
     }
     
-    // Détails des lipides
+    // Détails des lipides - important de gérer le cas où lipids est undefined
     if (food.nutrients.lipids) {
       totalNutrients.lipids.saturated += (food.nutrients.lipids.saturated || 0) * portionRatio;
       totalNutrients.lipids.monoUnsaturated += (food.nutrients.lipids.monoUnsaturated || 0) * portionRatio;
@@ -78,6 +78,15 @@ export const calculateTotalNutrients = (items: FoodWithQuantity[]) => {
       });
     }
   });
+  
+  // Ensure the Omega-3 + Omega-6 don't exceed polyUnsaturated total (for data consistency)
+  const totalOmegas = totalNutrients.lipids.omega3 + totalNutrients.lipids.omega6;
+  if (totalOmegas > totalNutrients.lipids.polyUnsaturated && totalNutrients.lipids.polyUnsaturated > 0) {
+    // Adjust omega values proportionally if their sum exceeds polyUnsaturated total
+    const adjustmentRatio = totalNutrients.lipids.polyUnsaturated / totalOmegas;
+    totalNutrients.lipids.omega3 *= adjustmentRatio;
+    totalNutrients.lipids.omega6 *= adjustmentRatio;
+  }
   
   return totalNutrients;
 };

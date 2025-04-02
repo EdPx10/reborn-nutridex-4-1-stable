@@ -11,6 +11,11 @@ interface NutrientProgressProps {
   indent?: boolean;
 }
 
+// Helper function to format numbers to 1 decimal place if needed
+const formatValue = (value: number): string => {
+  return Number.isInteger(value) ? value.toString() : value.toFixed(1);
+};
+
 export const NutrientProgress: React.FC<NutrientProgressProps> = ({ 
   label, 
   current, 
@@ -26,7 +31,7 @@ export const NutrientProgress: React.FC<NutrientProgressProps> = ({
       <div className="flex justify-between items-center mb-1">
         <span className="font-medium">{label}</span>
         <span>
-          {current.toFixed(2)}/{goal.toFixed(2)} {unit}
+          {formatValue(current)}/{formatValue(goal)} {unit}
         </span>
       </div>
       <ProgressBar 
@@ -36,7 +41,7 @@ export const NutrientProgress: React.FC<NutrientProgressProps> = ({
         height="h-3"
       />
       <div className="text-right text-sm text-gray-500 mt-1">
-        {percentage}% {goal > current ? `(Recommandation: ${goal.toFixed(2)} ${unit})` : '(Objectif atteint)'}
+        {percentage}% {goal > current ? `(Recommandation: ${formatValue(goal)} ${unit})` : '(Objectif atteint)'}
       </div>
     </div>
   );
