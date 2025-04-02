@@ -1,15 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { Search, Filter } from 'lucide-react';
-import { FoodCard } from '@/components/ui/FoodCard';
-import { foodCategories, healthBenefitsInfo, seasons } from '@/data/healthBenefits';
 import { getFilteredFoods } from '@/data/foods';
-import { Food, FoodCategory, HealthBenefit, Season } from '@/types';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
-import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import AddToDailyPlateDialog from '@/components/ui/AddToDailyPlateDialog';
+import { Food } from '@/types';
+import { SearchBar } from '@/components/explorateur/SearchBar';
+import { FiltersSection } from '@/components/explorateur/FiltersSection';
+import { FoodGrid } from '@/components/explorateur/FoodGrid';
 
 const Explorateur: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -18,11 +13,8 @@ const Explorateur: React.FC = () => {
   const [selectedSeason, setSelectedSeason] = useState<string | undefined>(undefined);
   const [foods, setFoods] = useState<Food[]>([]);
   const [showFilters, setShowFilters] = useState(false);
-  const [showSearchResults, setShowSearchResults] = useState(false);
   const [searchResults, setSearchResults] = useState<Food[]>([]);
   const [selectedFood, setSelectedFood] = useState<Food | null>(null);
-  const [quantityDialogOpen, setQuantityDialogOpen] = useState(false);
-  const isMobile = useIsMobile();
   
   useEffect(() => {
     // Reset foods array when filters change to prevent stale data
@@ -35,22 +27,11 @@ const Explorateur: React.FC = () => {
     if (searchTerm.length > 0) {
       const results = getFilteredFoods(searchTerm).slice(0, 8); // Limit to 8 results for better UX
       setSearchResults(results);
-      setShowSearchResults(true);
-    } else {
-      setShowSearchResults(false);
     }
   }, [searchTerm]);
 
-  const handleSelectFood = (food: Food) => {
-    setSelectedFood(food);
-    setQuantityDialogOpen(true);
-    setSearchTerm('');
-    setShowSearchResults(false);
-  };
-
-  const handleQuantityDialogClose = () => {
-    setQuantityDialogOpen(false);
-    setTimeout(() => setSelectedFood(null), 300);
+  const handleSearch = (term: string) => {
+    setSearchTerm(term);
   };
 
   const toggleCategory = (categoryId: string) => {
@@ -81,9 +62,6 @@ const Explorateur: React.FC = () => {
   const toggleFilters = () => {
     setShowFilters(!showFilters);
   };
-
-  // Déterminer si on affiche les filtres basé sur la taille d'écran et l'état
-  const displayFilters = !isMobile || showFilters;
   
   return (
     <div className="animate-fade-in">
@@ -95,149 +73,23 @@ const Explorateur: React.FC = () => {
         </p>
       </div>
       
-      <div className="relative max-w-2xl mx-auto mb-8">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-        <input
-          type="text"
-          placeholder="Rechercher un aliment par nom..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-10 pr-4 py-3 rounded-full border border-gray-200 focus:outline-none focus:border-nutri-green focus:ring-1 focus:ring-nutri-green"
-        />
-
-        {/* Search results dropdown */}
-        {showSearchResults && searchResults.length > 0 && (
-          <div className="absolute z-10 w-full mt-1 rounded-md border border-gray-200 bg-white shadow-lg">
-            <Command className="rounded-md">
-              <CommandList>
-                {searchResults.map((food) => (
-                  <CommandItem
-                    key={food.id}
-                    onSelect={() => handleSelectFood(food)}
-                    className="flex items-center gap-2 cursor-pointer p-2"
-                  >
-                    <div className="flex-1">
-                      <div>{food.name}</div>
-                      <div className="text-xs text-gray-500">{food.category}</div>
-                    </div>
-                  </CommandItem>
-                ))}
-              </CommandList>
-            </Command>
-          </div>
-        )}
-      </div>
+      <SearchBar 
+        searchTerm={searchTerm} 
+        onSearch={handleSearch} 
+      />
       
-      {isMobile && (
-        <div className="mb-4 flex justify-center">
-          <Button 
-            variant="outline" 
-            onClick={toggleFilters}
-            className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 bg-white shadow-sm"
-          >
-            <Filter size={16} />
-            Filtres
-            {showFilters ? (
-              <span className="ml-1 text-xs bg-nutri-green text-white rounded-full h-5 w-5 flex items-center justify-center">
-                {(selectedCategory ? 1 : 0) + (selectedBenefit ? 1 : 0) + (selectedSeason ? 1 : 0)}
-              </span>
-            ) : null}
-          </Button>
-        </div>
-      )}
+      <FiltersSection
+        selectedCategory={selectedCategory}
+        selectedBenefit={selectedBenefit}
+        selectedSeason={selectedSeason}
+        toggleCategory={toggleCategory}
+        toggleBenefit={toggleBenefit}
+        toggleSeason={toggleSeason}
+        showFilters={showFilters}
+        toggleFilters={toggleFilters}
+      />
       
-      <div className={`mb-8 ${isMobile ? 'overflow-hidden transition-all duration-300 ease-in-out' : ''}`} 
-           style={{ 
-             maxHeight: isMobile ? (displayFilters ? '1000px' : '0px') : 'auto',
-             opacity: isMobile ? (displayFilters ? 1 : 0) : 1,
-           }}>
-        {displayFilters && (
-          <div className={`space-y-4 ${isMobile ? 'animate-fade-in' : ''}`}>
-            <h3 className="font-medium text-lg mb-3">Filtres</h3>
-            
-            <div>
-              <h4 className="text-sm text-gray-500 mb-2">Catégories</h4>
-              <div className="flex flex-wrap gap-2">
-                {foodCategories.map(category => (
-                  <button
-                    key={category.id}
-                    onClick={() => toggleCategory(category.id)}
-                    className={`px-3 py-1 text-sm rounded-full transition ${
-                      selectedCategory === category.id 
-                        ? `${category.color} font-medium` 
-                        : 'bg-gray-100 hover:bg-gray-200'
-                    }`}
-                  >
-                    {category.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="text-sm text-gray-500 mb-2">Propriétés santé</h4>
-              <div className="flex flex-wrap gap-2">
-                {Object.entries(healthBenefitsInfo).map(([id, benefit]) => (
-                  <button
-                    key={id}
-                    onClick={() => toggleBenefit(id)}
-                    className={`px-3 py-1 text-sm rounded-full flex items-center gap-1 transition ${
-                      selectedBenefit === id
-                        ? benefit.color
-                        : 'bg-gray-100 hover:bg-gray-200'
-                    }`}
-                  >
-                    <benefit.icon size={14} />
-                    <span>{benefit.name}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="text-sm text-gray-500 mb-2">Saisons</h4>
-              <div className="flex flex-wrap gap-2">
-                {seasons.map(season => (
-                  <button
-                    key={season.id}
-                    onClick={() => toggleSeason(season.id)}
-                    className={`px-3 py-1 text-sm rounded-full transition ${
-                      selectedSeason === season.id 
-                        ? 'bg-nutri-green text-white font-medium' 
-                        : 'bg-gray-100 hover:bg-gray-200'
-                    }`}
-                  >
-                    {season.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {foods.map(food => (
-          <FoodCard 
-            key={food.id} 
-            food={food}
-          />
-        ))}
-        {foods.length === 0 && (
-          <div className="col-span-full text-center py-8">
-            <p className="text-gray-500">Aucun aliment ne correspond à vos critères</p>
-          </div>
-        )}
-      </div>
-
-      {/* Quantity Dialog for adding selected food to daily plate */}
-      {selectedFood && (
-        <AddToDailyPlateDialog
-          food={selectedFood}
-          isOpen={quantityDialogOpen}
-          onClose={handleQuantityDialogClose}
-        />
-      )}
+      <FoodGrid foods={foods} />
     </div>
   );
 };
