@@ -23,8 +23,13 @@ export const NutrientSection: React.FC<NutrientSectionProps> = ({
 
   // Filter out nutrients with value 0
   const nonZeroNutrients = Object.entries(nutrients)
-    .filter(([_, value]) => value > 0)
-    .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+    .filter(([_, value]) => typeof value === 'number' && value > 0)
+    .reduce<Record<string, number>>((acc, [key, value]) => {
+      if (typeof value === 'number') {
+        acc[key] = value;
+      }
+      return acc;
+    }, {});
 
   if (Object.keys(nonZeroNutrients).length === 0) {
     return null;
