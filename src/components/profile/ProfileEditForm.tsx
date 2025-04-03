@@ -15,9 +15,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { getNutrientIcon } from '@/components/ui/NutrientIcons';
-import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { renderNutrientField } from './NutrientFieldRenderer';
 
 const createNutrientSchema = () => {
   return z.object({
@@ -114,43 +113,6 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profile, onSubmit, on
     };
 
     onSubmit(updatedProfile);
-  };
-
-  const renderNutrientField = (
-    category: 'macro' | 'vitamines' | 'mineraux' | 'oligoelements',
-    nutrientKey: string,
-    label: string,
-    unit: string,
-    path: string
-  ) => {
-    return (
-      <div className="flex items-center gap-3 my-3">
-        <div className="flex items-center gap-2 flex-1">
-          {getNutrientIcon(category, nutrientKey, 16)}
-          <span className="text-sm">{label}</span>
-        </div>
-        <FormField
-          control={form.control}
-          name={path as any}
-          render={({ field }) => (
-            <FormItem className="flex-none w-28">
-              <div className="flex items-center">
-                <FormControl>
-                  <Input
-                    type="number"
-                    placeholder="Valeur"
-                    className="w-20 text-right"
-                    {...field}
-                  />
-                </FormControl>
-                <span className="ml-1 text-sm text-gray-500">{unit}</span>
-              </div>
-              <FormMessage className="text-xs" />
-            </FormItem>
-          )}
-        />
-      </div>
-    );
   };
 
   return (
@@ -264,23 +226,52 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profile, onSubmit, on
               <div className="rounded-lg border p-4">
                 <h3 className="font-medium mb-2">Macronutriments</h3>
                 
-                {renderNutrientField('macro', 'glucides', 'Glucides', 'g', 'goals.glucides.goal')}
-                {renderNutrientField('macro', 'proteines', 'Protéines', 'g', 'goals.proteines.goal')}
-                {renderNutrientField('macro', 'lipides', 'Lipides', 'g', 'goals.lipides.goal')}
-                {renderNutrientField('macro', 'fibres', 'Fibres', 'g', 'goals.fibres.goal')}
+                {renderNutrientField({
+                  category: 'macro',
+                  nutrientKey: 'glucides',
+                  label: 'Glucides',
+                  unit: 'g',
+                  path: 'goals.glucides.goal',
+                  form
+                })}
+                {renderNutrientField({
+                  category: 'macro',
+                  nutrientKey: 'proteines',
+                  label: 'Protéines',
+                  unit: 'g',
+                  path: 'goals.proteines.goal',
+                  form
+                })}
+                {renderNutrientField({
+                  category: 'macro',
+                  nutrientKey: 'lipides',
+                  label: 'Lipides',
+                  unit: 'g',
+                  path: 'goals.lipides.goal',
+                  form
+                })}
+                {renderNutrientField({
+                  category: 'macro',
+                  nutrientKey: 'fibres',
+                  label: 'Fibres',
+                  unit: 'g',
+                  path: 'goals.fibres.goal',
+                  form
+                })}
               </div>
               
               <div className="rounded-lg border p-4">
                 <h3 className="font-medium mb-2">Vitamines</h3>
                 
                 {Object.entries(profile.goals.vitamines).map(([key, value]) => (
-                  renderNutrientField(
-                    'vitamines', 
-                    key, 
-                    `Vitamine ${key.toUpperCase()}`, 
-                    value.unit, 
-                    `goals.vitamines.${key}.goal`
-                  )
+                  renderNutrientField({
+                    category: 'vitamines',
+                    nutrientKey: key,
+                    label: `Vitamine ${key.toUpperCase()}`,
+                    unit: value.unit,
+                    path: `goals.vitamines.${key}.goal`,
+                    form
+                  })
                 ))}
               </div>
               
@@ -288,13 +279,14 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profile, onSubmit, on
                 <h3 className="font-medium mb-2">Minéraux</h3>
                 
                 {Object.entries(profile.goals.mineraux).map(([key, value]) => (
-                  renderNutrientField(
-                    'mineraux', 
-                    key, 
-                    key.charAt(0).toUpperCase() + key.slice(1), 
-                    value.unit, 
-                    `goals.mineraux.${key}.goal`
-                  )
+                  renderNutrientField({
+                    category: 'mineraux',
+                    nutrientKey: key,
+                    label: key.charAt(0).toUpperCase() + key.slice(1),
+                    unit: value.unit,
+                    path: `goals.mineraux.${key}.goal`,
+                    form
+                  })
                 ))}
               </div>
               
@@ -303,13 +295,14 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profile, onSubmit, on
                   <h3 className="font-medium mb-2">Oligo-éléments</h3>
                   
                   {Object.entries(profile.goals.oligoelements).map(([key, value]) => (
-                    renderNutrientField(
-                      'oligoelements', 
-                      key, 
-                      key.charAt(0).toUpperCase() + key.slice(1), 
-                      value.unit, 
-                      `goals.oligoelements.${key}.goal`
-                    )
+                    renderNutrientField({
+                      category: 'oligoelements',
+                      nutrientKey: key,
+                      label: key.charAt(0).toUpperCase() + key.slice(1),
+                      unit: value.unit,
+                      path: `goals.oligoelements.${key}.goal`,
+                      form
+                    })
                   ))}
                 </div>
               )}
