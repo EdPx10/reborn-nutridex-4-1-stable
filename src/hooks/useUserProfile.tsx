@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { UserProfile } from '@/types';
 
@@ -129,12 +128,19 @@ export const useUserProfile = () => {
     return false;
   };
 
-  // Added missing method needed by MonAssiette.tsx and ProfilUtilisateur.tsx
+  // Fix the updateNutrientIntake function to correctly handle the lipides vs lipids naming
   const updateNutrientIntake = (nutrients: {
     glucides: number;
     proteines: number;
     lipides: number;
     fibres: number;
+    lipids?: {
+      saturated: number;
+      monoUnsaturated: number;
+      polyUnsaturated: number;
+      omega3: number;
+      omega6: number;
+    };
     vitamines: {
       [key: string]: number;
     };
