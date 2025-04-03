@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { UserProfile } from '@/types';
 
@@ -39,18 +38,15 @@ export const useUserProfile = () => {
   const [activeProfile, setActiveProfile] = useState<UserProfile | null>(null);
 
   useEffect(() => {
-    // Charger les profils depuis localStorage
     const storedProfiles = localStorage.getItem('nutridex-profiles');
     
     if (storedProfiles) {
       const parsedProfiles = JSON.parse(storedProfiles);
       setProfiles(parsedProfiles);
       
-      // Trouver le profil actif
       const active = parsedProfiles.find((p: UserProfile) => p.isActive);
       setActiveProfile(active || null);
     } else {
-      // Créer un profil par défaut si aucun n'existe
       setProfiles([DEFAULT_PROFILE]);
       setActiveProfile(DEFAULT_PROFILE);
       localStorage.setItem('nutridex-profiles', JSON.stringify([DEFAULT_PROFILE]));
@@ -100,7 +96,6 @@ export const useUserProfile = () => {
     localStorage.setItem('nutridex-profiles', JSON.stringify(updatedProfiles));
   };
 
-  // Nouvelle fonction pour mettre à jour les apports nutritionnels
   const updateNutrientIntake = (nutrients: {
     glucides?: number;
     proteines?: number;
@@ -114,40 +109,29 @@ export const useUserProfile = () => {
 
     const updatedProfile = { ...activeProfile };
     
-    // Mise à jour des macronutriments
     if (nutrients.glucides !== undefined) updatedProfile.goals.glucides.current = nutrients.glucides;
     if (nutrients.proteines !== undefined) updatedProfile.goals.proteines.current = nutrients.proteines;
     if (nutrients.lipides !== undefined) updatedProfile.goals.lipides.current = nutrients.lipides;
     if (nutrients.fibres !== undefined) updatedProfile.goals.fibres.current = nutrients.fibres;
     
-    // Mise à jour des vitamines
     if (nutrients.vitamines) {
-      Object.entries(nutrients.vitamines).forEach(([key, value]) => {
-        if (updatedProfile.goals.vitamines[key]) {
-          updatedProfile.goals.vitamines[key].current = value;
-        }
+      Object.keys(updatedProfile.goals.vitamines).forEach(key => {
+        updatedProfile.goals.vitamines[key].current = nutrients.vitamines[key] || 0;
       });
     }
     
-    // Mise à jour des minéraux
     if (nutrients.mineraux) {
-      Object.entries(nutrients.mineraux).forEach(([key, value]) => {
-        if (updatedProfile.goals.mineraux[key]) {
-          updatedProfile.goals.mineraux[key].current = value;
-        }
+      Object.keys(updatedProfile.goals.mineraux).forEach(key => {
+        updatedProfile.goals.mineraux[key].current = nutrients.mineraux[key] || 0;
       });
     }
     
-    // Mise à jour des oligo-éléments
     if (nutrients.oligoelements && updatedProfile.goals.oligoelements) {
-      Object.entries(nutrients.oligoelements).forEach(([key, value]) => {
-        if (updatedProfile.goals.oligoelements?.[key]) {
-          updatedProfile.goals.oligoelements[key].current = value;
-        }
+      Object.keys(updatedProfile.goals.oligoelements).forEach(key => {
+        updatedProfile.goals.oligoelements[key].current = nutrients.oligoelements[key] || 0;
       });
     }
     
-    // Met à jour le profile
     updateProfile(updatedProfile);
   };
 
