@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Search, Trash2, Plus } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
@@ -29,6 +28,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   // Update search results when search term changes
   useEffect(() => {
     if (searchTerm.length > 0) {
+      // This will now use the startsWith() filter from foodUtils.ts
       const results = getFilteredFoods(searchTerm).slice(0, 8); // Limit to 8 results
       setSearchResults(results);
       setShowSearchResults(results.length > 0);
