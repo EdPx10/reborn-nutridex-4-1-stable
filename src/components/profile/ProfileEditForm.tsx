@@ -20,7 +20,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Le nom doit contenir au moins 2 caractères' }),
   age: z.coerce.number().min(1, { message: 'L\'âge doit être supérieur à 0' }).max(120, { message: 'L\'âge doit être inférieur à 120' }),
-  gender: z.enum(['homme', 'femme']),
+  gender: z.enum(['homme', 'femme', 'autre']),
   weight: z.coerce.number().min(1, { message: 'Le poids doit être supérieur à 0' }),
   height: z.coerce.number().min(1, { message: 'La taille doit être supérieure à 0' }),
 });
@@ -135,6 +135,12 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profile, onSubmit, on
                       <RadioGroupItem value="femme" />
                     </FormControl>
                     <FormLabel className="font-normal">Femme</FormLabel>
+                  </FormItem>
+                  <FormItem className="flex items-center space-x-3 space-y-0">
+                    <FormControl>
+                      <RadioGroupItem value="autre" />
+                    </FormControl>
+                    <FormLabel className="font-normal">Autre</FormLabel>
                   </FormItem>
                 </RadioGroup>
               </FormControl>
