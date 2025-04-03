@@ -13,6 +13,13 @@ const DEFAULT_PROFILE: UserProfile = {
     glucides: { current: 0, goal: 275, unit: 'g' },
     proteines: { current: 0, goal: 55, unit: 'g' },
     lipides: { current: 0, goal: 78, unit: 'g' },
+    lipids: {
+      saturated: { current: 0, goal: 26, unit: 'g' }, // ~1/3 des lipides totaux
+      monoUnsaturated: { current: 0, goal: 26, unit: 'g' }, // ~1/3 des lipides totaux
+      polyUnsaturated: { current: 0, goal: 26, unit: 'g' }, // ~1/3 des lipides totaux
+      omega3: { current: 0, goal: 2, unit: 'g' }, // Recommandation AHA
+      omega6: { current: 0, goal: 10, unit: 'g' } // Recommandation générale
+    },
     fibres: { current: 0, goal: 30, unit: 'g' },
     vitamines: {
       c: { current: 0, goal: 90, unit: 'mg' },
@@ -28,120 +35,106 @@ const DEFAULT_PROFILE: UserProfile = {
     oligoelements: {
       zinc: { current: 0, goal: 11, unit: 'mg' },
       selenium: { current: 0, goal: 55, unit: 'µg' },
-      iode: { current: 0, goal: 150, unit: 'µg' },
     }
-  },
-  isActive: true,
+  }
 };
 
 export const useUserProfile = () => {
-  const [profiles, setProfiles] = useState<UserProfile[]>([]);
-  const [activeProfile, setActiveProfile] = useState<UserProfile | null>(null);
+  const [profiles, setProfiles] = useState<UserProfile[]>([DEFAULT_PROFILE]);
+  const [activeProfileId, setActiveProfileId] = useState<string>(DEFAULT_PROFILE.id);
 
+  // Load profiles from localStorage on initial render
   useEffect(() => {
-    const storedProfiles = localStorage.getItem('nutridex-profiles');
+    const savedProfiles = localStorage.getItem('userProfiles');
+    const savedActiveProfileId = localStorage.getItem('activeProfileId');
     
-    if (storedProfiles) {
-      const parsedProfiles = JSON.parse(storedProfiles);
-      setProfiles(parsedProfiles);
-      
-      const active = parsedProfiles.find((p: UserProfile) => p.isActive);
-      setActiveProfile(active || null);
-    } else {
-      setProfiles([DEFAULT_PROFILE]);
-      setActiveProfile(DEFAULT_PROFILE);
-      localStorage.setItem('nutridex-profiles', JSON.stringify([DEFAULT_PROFILE]));
+    if (savedProfiles) {
+      try {
+        const parsedProfiles = JSON.parse(savedProfiles);
+        // Assurer la rétrocompatibilité avec les profils sans objectifs détaillés de lipides
+        const updatedProfiles = parsedProfiles.map((profile: UserProfile) => {
+          if (!profile.goals.lipids) {
+            // Calculer les valeurs par défaut basées sur les lipides totaux
+            const totalLipids = profile.goals.lipides.goal;
+            profile.goals.lipids = {
+              saturated: { current: 0, goal: Math.round(totalLipids * 0.33), unit: 'g' },
+              monoUnsaturated: { current: 0, goal: Math.round(totalLipids * 0.33), unit: 'g' },
+              polyUnsaturated: { current: 0, goal: Math.round(totalLipids * 0.33), unit: 'g' },
+              omega3: { current: 0, goal: 2, unit: 'g' },
+              omega6: { current: 0, goal: 10, unit: 'g' }
+            };
+          }
+          return profile;
+        });
+        setProfiles(updatedProfiles);
+      } catch (error) {
+        console.error('Error parsing saved profiles:', error);
+        setProfiles([DEFAULT_PROFILE]);
+      }
+    }
+    
+    if (savedActiveProfileId) {
+      setActiveProfileId(savedActiveProfileId);
     }
   }, []);
 
-  const createProfile = (profile: Omit<UserProfile, 'id' | 'isActive'>) => {
-    const newProfile: UserProfile = {
-      ...profile,
-      id: `profile-${Date.now()}`,
-      isActive: true,
+  // Save profiles to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('userProfiles', JSON.stringify(profiles));
+    localStorage.setItem('activeProfileId', activeProfileId);
+  }, [profiles, activeProfileId]);
+
+  const getActiveProfile = (): UserProfile => {
+    return profiles.find(profile => profile.id === activeProfileId) || DEFAULT_PROFILE;
+  };
+
+  const updateProfile = (updatedProfile: UserProfile) => {
+    setProfiles(profiles.map(profile => 
+      profile.id === updatedProfile.id ? updatedProfile : profile
+    ));
+  };
+
+  const addProfile = (newProfile: Omit<UserProfile, 'id'>) => {
+    const profileWithId = {
+      ...newProfile,
+      id: `profile-${new Date().getTime()}`
     };
-    
-    const updatedProfiles = profiles.map(p => ({
-      ...p,
-      isActive: false
-    })).concat(newProfile);
-    
-    setProfiles(updatedProfiles);
-    setActiveProfile(newProfile);
-    localStorage.setItem('nutridex-profiles', JSON.stringify(updatedProfiles));
+    setProfiles([...profiles, profileWithId as UserProfile]);
+    return profileWithId.id;
   };
 
-  const updateProfile = (profile: UserProfile) => {
-    const updatedProfiles = profiles.map(p => 
-      p.id === profile.id ? profile : p
-    );
-    
-    setProfiles(updatedProfiles);
-    if (profile.isActive) {
-      setActiveProfile(profile);
+  const removeProfile = (profileId: string) => {
+    if (profiles.length <= 1) {
+      return false;
     }
     
-    localStorage.setItem('nutridex-profiles', JSON.stringify(updatedProfiles));
+    const newProfiles = profiles.filter(profile => profile.id !== profileId);
+    setProfiles(newProfiles);
+    
+    if (activeProfileId === profileId) {
+      setActiveProfileId(newProfiles[0].id);
+    }
+    
+    return true;
   };
 
-  const setActiveProfileById = (profileId: string) => {
-    const updatedProfiles = profiles.map(p => ({
-      ...p,
-      isActive: p.id === profileId
-    }));
-    
-    const newActiveProfile = updatedProfiles.find(p => p.id === profileId) || null;
-    
-    setProfiles(updatedProfiles);
-    setActiveProfile(newActiveProfile);
-    localStorage.setItem('nutridex-profiles', JSON.stringify(updatedProfiles));
-  };
-
-  const updateNutrientIntake = (nutrients: {
-    glucides?: number;
-    proteines?: number;
-    lipides?: number;
-    fibres?: number;
-    vitamines?: Record<string, number>;
-    mineraux?: Record<string, number>;
-    oligoelements?: Record<string, number>;
-  }) => {
-    if (!activeProfile) return;
-
-    const updatedProfile = { ...activeProfile };
-    
-    if (nutrients.glucides !== undefined) updatedProfile.goals.glucides.current = nutrients.glucides;
-    if (nutrients.proteines !== undefined) updatedProfile.goals.proteines.current = nutrients.proteines;
-    if (nutrients.lipides !== undefined) updatedProfile.goals.lipides.current = nutrients.lipides;
-    if (nutrients.fibres !== undefined) updatedProfile.goals.fibres.current = nutrients.fibres;
-    
-    if (nutrients.vitamines) {
-      Object.keys(updatedProfile.goals.vitamines).forEach(key => {
-        updatedProfile.goals.vitamines[key].current = nutrients.vitamines[key] || 0;
-      });
+  const setActiveProfile = (profileId: string) => {
+    if (profiles.some(profile => profile.id === profileId)) {
+      setActiveProfileId(profileId);
+      return true;
     }
-    
-    if (nutrients.mineraux) {
-      Object.keys(updatedProfile.goals.mineraux).forEach(key => {
-        updatedProfile.goals.mineraux[key].current = nutrients.mineraux[key] || 0;
-      });
-    }
-    
-    if (nutrients.oligoelements && updatedProfile.goals.oligoelements) {
-      Object.keys(updatedProfile.goals.oligoelements).forEach(key => {
-        updatedProfile.goals.oligoelements[key].current = nutrients.oligoelements[key] || 0;
-      });
-    }
-    
-    updateProfile(updatedProfile);
+    return false;
   };
 
   return {
     profiles,
-    activeProfile,
-    createProfile,
+    activeProfileId,
+    getActiveProfile,
     updateProfile,
-    setActiveProfileById,
-    updateNutrientIntake,
+    addProfile,
+    removeProfile,
+    setActiveProfile,
   };
 };
+
+export default useUserProfile;

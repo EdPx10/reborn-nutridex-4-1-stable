@@ -24,6 +24,13 @@ interface MacronutrientTabProps {
       proteines: { goal: number };
       lipides: { goal: number };
       fibres: { goal: number };
+      lipids?: {
+        saturated: { goal: number };
+        monoUnsaturated: { goal: number };
+        polyUnsaturated: { goal: number };
+        omega3: { goal: number };
+        omega6: { goal: number };
+      };
     };
   };
 }
@@ -42,13 +49,13 @@ export const MacronutrientTab: React.FC<MacronutrientTabProps> = ({
   const omega3 = totalNutrients.lipids?.omega3 || 0;
   const omega6 = totalNutrients.lipids?.omega6 || 0;
 
-  // Lipid goals for subtypes (approximations)
+  // Lipid goals from profile or defaults
   const lipidGoal = activeProfile.goals.lipides.goal || 78;
-  const saturatedGoal = lipidGoal * 0.33; // ~33% of total lipids
-  const monoUnsaturatedGoal = lipidGoal * 0.33; // ~33% of total lipids
-  const polyUnsaturatedGoal = lipidGoal * 0.33; // ~33% of total lipids
-  const omega3Goal = 2; // Common recommendation
-  const omega6Goal = 10; // Common recommendation
+  const saturatedGoal = activeProfile.goals.lipids?.saturated.goal || Math.round(lipidGoal * 0.33);
+  const monoUnsaturatedGoal = activeProfile.goals.lipids?.monoUnsaturated.goal || Math.round(lipidGoal * 0.33);
+  const polyUnsaturatedGoal = activeProfile.goals.lipids?.polyUnsaturated.goal || Math.round(lipidGoal * 0.33);
+  const omega3Goal = activeProfile.goals.lipids?.omega3.goal || 2;
+  const omega6Goal = activeProfile.goals.lipids?.omega6.goal || 10;
 
   return (
     <div className="space-y-6">

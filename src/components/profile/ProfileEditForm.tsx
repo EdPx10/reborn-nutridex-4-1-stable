@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -17,6 +18,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { renderNutrientField } from './NutrientFieldRenderer';
+import { Separator } from '@/components/ui/separator';
 
 const createNutrientSchema = () => {
   return z.object({
@@ -35,6 +37,13 @@ const formSchema = z.object({
     proteines: createNutrientSchema(),
     lipides: createNutrientSchema(),
     fibres: createNutrientSchema(),
+    lipids: z.object({
+      saturated: createNutrientSchema(),
+      monoUnsaturated: createNutrientSchema(),
+      polyUnsaturated: createNutrientSchema(),
+      omega3: createNutrientSchema(),
+      omega6: createNutrientSchema(),
+    }),
     vitamines: z.record(createNutrientSchema()),
     mineraux: z.record(createNutrientSchema()),
     oligoelements: z.record(createNutrientSchema()),
@@ -52,6 +61,15 @@ interface ProfileEditFormProps {
 const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profile, onSubmit, onCancel }) => {
   const [activeTab, setActiveTab] = useState<string>("personal");
   
+  // S'assurer que le profil a bien les objectifs de lipides détaillés
+  const defaultLipidGoals = {
+    saturated: { goal: profile.goals.lipids?.saturated.goal || Math.round(profile.goals.lipides.goal * 0.33) },
+    monoUnsaturated: { goal: profile.goals.lipids?.monoUnsaturated.goal || Math.round(profile.goals.lipides.goal * 0.33) },
+    polyUnsaturated: { goal: profile.goals.lipids?.polyUnsaturated.goal || Math.round(profile.goals.lipides.goal * 0.33) },
+    omega3: { goal: profile.goals.lipids?.omega3.goal || 2 },
+    omega6: { goal: profile.goals.lipids?.omega6.goal || 10 },
+  };
+  
   const defaultValues = {
     name: profile.name,
     age: profile.age,
@@ -63,6 +81,7 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profile, onSubmit, on
       proteines: { goal: profile.goals.proteines.goal },
       lipides: { goal: profile.goals.lipides.goal },
       fibres: { goal: profile.goals.fibres.goal },
+      lipids: defaultLipidGoals,
       vitamines: Object.entries(profile.goals.vitamines).reduce((acc, [key, value]) => {
         acc[key] = { goal: value.goal };
         return acc;
@@ -97,6 +116,13 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profile, onSubmit, on
         proteines: { ...profile.goals.proteines, goal: values.goals.proteines.goal },
         lipides: { ...profile.goals.lipides, goal: values.goals.lipides.goal },
         fibres: { ...profile.goals.fibres, goal: values.goals.fibres.goal },
+        lipids: {
+          saturated: { ...profile.goals.lipids?.saturated || { current: 0, unit: 'g' }, goal: values.goals.lipids.saturated.goal },
+          monoUnsaturated: { ...profile.goals.lipids?.monoUnsaturated || { current: 0, unit: 'g' }, goal: values.goals.lipids.monoUnsaturated.goal },
+          polyUnsaturated: { ...profile.goals.lipids?.polyUnsaturated || { current: 0, unit: 'g' }, goal: values.goals.lipids.polyUnsaturated.goal },
+          omega3: { ...profile.goals.lipids?.omega3 || { current: 0, unit: 'g' }, goal: values.goals.lipids.omega3.goal },
+          omega6: { ...profile.goals.lipids?.omega6 || { current: 0, unit: 'g' }, goal: values.goals.lipids.omega6.goal },
+        },
         vitamines: Object.entries(values.goals.vitamines).reduce((acc, [key, value]) => {
           acc[key] = { ...profile.goals.vitamines[key], goal: value.goal };
           return acc;
@@ -245,11 +271,56 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profile, onSubmit, on
                 {renderNutrientField({
                   category: 'macro',
                   nutrientKey: 'lipides',
-                  label: 'Lipides',
+                  label: 'Lipides (Total)',
                   unit: 'g',
                   path: 'goals.lipides.goal',
                   form
                 })}
+                
+                <Separator className="my-3" />
+                <h4 className="text-sm text-gray-500 mb-2">Lipides détaillés</h4>
+                
+                {renderNutrientField({
+                  category: 'macro',
+                  nutrientKey: 'lipides',
+                  label: 'Acides gras saturés (AGS)',
+                  unit: 'g',
+                  path: 'goals.lipids.saturated.goal',
+                  form
+                })}
+                {renderNutrientField({
+                  category: 'macro',
+                  nutrientKey: 'lipides',
+                  label: 'Acides gras mono-insaturés (AMS)',
+                  unit: 'g',
+                  path: 'goals.lipids.monoUnsaturated.goal',
+                  form
+                })}
+                {renderNutrientField({
+                  category: 'macro',
+                  nutrientKey: 'lipides',
+                  label: 'Acides gras poly-insaturés (AGP)',
+                  unit: 'g',
+                  path: 'goals.lipids.polyUnsaturated.goal',
+                  form
+                })}
+                {renderNutrientField({
+                  category: 'macro',
+                  nutrientKey: 'lipides',
+                  label: 'Oméga-3',
+                  unit: 'g',
+                  path: 'goals.lipids.omega3.goal',
+                  form
+                })}
+                {renderNutrientField({
+                  category: 'macro',
+                  nutrientKey: 'lipides',
+                  label: 'Oméga-6',
+                  unit: 'g',
+                  path: 'goals.lipids.omega6.goal',
+                  form
+                })}
+
                 {renderNutrientField({
                   category: 'macro',
                   nutrientKey: 'fibres',

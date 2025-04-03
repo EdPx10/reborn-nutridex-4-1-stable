@@ -2,13 +2,16 @@
 import React from 'react';
 import { UserProfile } from '@/types';
 import MacroNutrient from './MacroNutrient';
-import Accordion from '@/components/mon-assiette/Accordion';  // Updated to use our custom Accordion
+import Accordion from '@/components/mon-assiette/Accordion';
 
 interface MacroNutrientSectionProps {
   profile: UserProfile;
 }
 
 const MacroNutrientSection: React.FC<MacroNutrientSectionProps> = ({ profile }) => {
+  // Vérifier si le profil a des objectifs de lipides détaillés
+  const hasDetailedLipids = profile.goals.lipids !== undefined;
+  
   return (
     <div className="space-y-8">
       <MacroNutrient
@@ -31,60 +34,51 @@ const MacroNutrientSection: React.FC<MacroNutrientSectionProps> = ({ profile }) 
             showIcon={false}
           />
           
-          <div className="space-y-6 mt-6">
-            <MacroNutrient
-              label="Acides gras saturés"
-              nutrientKey="lipides"
-              goal={profile.goals.lipides}
-              subGoalPercentage={0.33}
-              showIcon={false}
-              indent={true}
-            />
-            
-            <MacroNutrient
-              label="Acides gras mono-insaturés"
-              nutrientKey="lipides"
-              goal={profile.goals.lipides}
-              subGoalPercentage={0.33}
-              showIcon={false}
-              indent={true}
-            />
-            
-            <MacroNutrient
-              label="Acides gras poly-insaturés (Total)"
-              nutrientKey="lipides"
-              goal={profile.goals.lipides}
-              subGoalPercentage={0.33}
-              showIcon={false}
-              indent={true}
-            />
-            
-            <div className="ml-6 space-y-6 mt-6">
+          {hasDetailedLipids && (
+            <div className="space-y-6 mt-6">
               <MacroNutrient
-                label="Oméga-3"
+                label="Acides gras saturés (AGS)"
                 nutrientKey="lipides"
-                goal={{
-                  current: profile.goals.lipides.current * 0.05,
-                  goal: 2,
-                  unit: 'g'
-                }}
+                goal={profile.goals.lipids!.saturated}
                 showIcon={false}
                 indent={true}
               />
               
               <MacroNutrient
-                label="Oméga-6"
+                label="Acides gras mono-insaturés (AMS)"
                 nutrientKey="lipides"
-                goal={{
-                  current: profile.goals.lipides.current * 0.1,
-                  goal: 10,
-                  unit: 'g'
-                }}
+                goal={profile.goals.lipids!.monoUnsaturated}
                 showIcon={false}
                 indent={true}
               />
+              
+              <MacroNutrient
+                label="Acides gras poly-insaturés (AGP)"
+                nutrientKey="lipides"
+                goal={profile.goals.lipids!.polyUnsaturated}
+                showIcon={false}
+                indent={true}
+              />
+              
+              <div className="ml-6 space-y-6 mt-6">
+                <MacroNutrient
+                  label="Oméga-3"
+                  nutrientKey="lipides"
+                  goal={profile.goals.lipids!.omega3}
+                  showIcon={false}
+                  indent={true}
+                />
+                
+                <MacroNutrient
+                  label="Oméga-6"
+                  nutrientKey="lipides"
+                  goal={profile.goals.lipids!.omega6}
+                  showIcon={false}
+                  indent={true}
+                />
+              </div>
             </div>
-          </div>
+          )}
         </Accordion>
       </div>
       
