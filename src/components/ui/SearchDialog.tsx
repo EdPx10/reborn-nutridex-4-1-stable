@@ -3,10 +3,11 @@ import React, { useState, useEffect } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { Search, X } from 'lucide-react';
+import { Search, X, Plus } from 'lucide-react';
 import { Food } from '@/types';
 import { getFilteredFoods } from '@/data/foods';
 import AddToDailyPlateDialog from './AddToDailyPlateDialog';
+import { Link } from 'react-router-dom';
 
 interface SearchDialogProps {
   isOpen: boolean;
@@ -28,11 +29,13 @@ const SearchDialog: React.FC<SearchDialogProps> = ({ isOpen, onClose }) => {
     }
   }, [searchTerm]);
 
-  const handleSelectFood = (food: Food) => {
+  const handleAddToPlate = (food: Food, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     setSelectedFood(food);
     setQuantityDialogOpen(true);
   };
-
+  
   const handleQuantityDialogClose = () => {
     setQuantityDialogOpen(false);
     // Wait for animation to complete before clearing selection
@@ -80,13 +83,23 @@ const SearchDialog: React.FC<SearchDialogProps> = ({ isOpen, onClose }) => {
                   searchResults.map((food) => (
                     <CommandItem
                       key={food.id}
-                      onSelect={() => handleSelectFood(food)}
-                      className="flex items-center gap-2 cursor-pointer p-2"
+                      className="flex items-center justify-between cursor-pointer p-2"
                     >
-                      <div className="flex-1 text-left">
+                      <Link 
+                        to={`/aliment/${food.id}`} 
+                        className="flex-1 text-left"
+                        onClick={handleClose}
+                      >
                         <div>{food.name}</div>
                         <div className="text-xs text-gray-500">{food.category}</div>
-                      </div>
+                      </Link>
+                      <button 
+                        onClick={(e) => handleAddToPlate(food, e)}
+                        className="ml-2 p-1 rounded-full hover:bg-gray-100"
+                        aria-label="Ajouter à mon assiette"
+                      >
+                        <Plus size={18} className="text-nutri-green" />
+                      </button>
                     </CommandItem>
                   ))
                 )}

@@ -13,22 +13,12 @@ const Explorateur: React.FC = () => {
   const [selectedSeason, setSelectedSeason] = useState<string | undefined>(undefined);
   const [foods, setFoods] = useState<Food[]>([]);
   const [showFilters, setShowFilters] = useState(false);
-  const [searchResults, setSearchResults] = useState<Food[]>([]);
-  const [selectedFood, setSelectedFood] = useState<Food | null>(null);
   
   useEffect(() => {
     // Reset foods array when filters change to prevent stale data
     const filtered = getFilteredFoods(searchTerm, selectedCategory, selectedBenefit, selectedSeason);
     setFoods(filtered);
   }, [searchTerm, selectedCategory, selectedBenefit, selectedSeason]);
-
-  // Handle search input changes
-  useEffect(() => {
-    if (searchTerm.length > 0) {
-      const results = getFilteredFoods(searchTerm).slice(0, 8); // Limit to 8 results for better UX
-      setSearchResults(results);
-    }
-  }, [searchTerm]);
 
   const handleSearch = (term: string) => {
     setSearchTerm(term);

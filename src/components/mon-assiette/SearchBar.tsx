@@ -1,11 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { Search, Trash2 } from 'lucide-react';
+import { Search, Trash2, Plus } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Command, CommandEmpty, CommandItem, CommandList } from '@/components/ui/command';
 import { getFilteredFoods } from '@/data/foods';
 import { Food } from '@/types';
 import AddToDailyPlateDialog from '@/components/ui/AddToDailyPlateDialog';
+import { Link } from 'react-router-dom';
 
 interface SearchBarProps {
   searchTerm: string;
@@ -28,14 +29,17 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   // Update search results when search term changes
   useEffect(() => {
     if (searchTerm.length > 0) {
-      setSearchResults(getFilteredFoods(searchTerm).slice(0, 8)); // Limit to 8 results
-      setShowSearchResults(true);
+      const results = getFilteredFoods(searchTerm).slice(0, 8); // Limit to 8 results
+      setSearchResults(results);
+      setShowSearchResults(results.length > 0);
     } else {
       setShowSearchResults(false);
     }
   }, [searchTerm]);
 
-  const handleSelectFood = (food: Food) => {
+  const handleAddToPlate = (food: Food, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     setSelectedFood(food);
     setQuantityDialogOpen(true);
     setSearchTerm('');
@@ -67,13 +71,26 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                 {searchResults.map((food) => (
                   <CommandItem
                     key={food.id}
-                    onSelect={() => handleSelectFood(food)}
-                    className="flex items-center gap-2 cursor-pointer p-2"
+                    className="flex items-center justify-between cursor-pointer p-2"
                   >
-                    <div className="flex-1">
+                    <Link 
+                      to={`/aliment/${food.id}`} 
+                      className="flex-1 text-left"
+                      onClick={() => {
+                        setSearchTerm('');
+                        setShowSearchResults(false);
+                      }}
+                    >
                       <div>{food.name}</div>
                       <div className="text-xs text-gray-500">{food.category}</div>
-                    </div>
+                    </Link>
+                    <button 
+                      onClick={(e) => handleAddToPlate(food, e)}
+                      className="ml-2 p-1 rounded-full hover:bg-gray-100"
+                      aria-label="Ajouter à mon assiette"
+                    >
+                      <Plus size={18} className="text-nutri-green" />
+                    </button>
                   </CommandItem>
                 ))}
               </CommandList>

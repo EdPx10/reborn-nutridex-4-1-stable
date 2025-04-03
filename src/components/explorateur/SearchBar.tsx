@@ -1,9 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
-import { Search } from 'lucide-react';
+import { Search, Plus } from 'lucide-react';
 import { Food } from '@/types';
 import { Command, CommandEmpty, CommandItem, CommandList } from '@/components/ui/command';
 import AddToDailyPlateDialog from '@/components/ui/AddToDailyPlateDialog';
+import { Link } from 'react-router-dom';
+import { getFilteredFoods } from '@/data/foods';
 
 interface SearchBarProps {
   onSearch: (term: string) => void;
@@ -16,17 +18,22 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, searchTerm }) => {
   const [selectedFood, setSelectedFood] = useState<Food | null>(null);
   const [quantityDialogOpen, setQuantityDialogOpen] = useState(false);
 
-  // This function would be called from the parent to update search results
-  const updateSearchResults = (results: Food[]) => {
-    setSearchResults(results);
-    setShowSearchResults(results.length > 0 && searchTerm.length > 0);
-  };
+  // Update search results when search term changes
+  useEffect(() => {
+    if (searchTerm.length > 0) {
+      const results = getFilteredFoods(searchTerm).slice(0, 8); // Limit to 8 results
+      setSearchResults(results);
+      setShowSearchResults(results.length > 0);
+    } else {
+      setShowSearchResults(false);
+    }
+  }, [searchTerm]);
 
-  const handleSelectFood = (food: Food) => {
+  const handleAddToPlate = (food: Food, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     setSelectedFood(food);
     setQuantityDialogOpen(true);
-    onSearch(''); // Clear search term
-    setShowSearchResults(false);
   };
 
   const handleQuantityDialogClose = () => {
@@ -53,13 +60,22 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, searchTerm }) => {
               {searchResults.map((food) => (
                 <CommandItem
                   key={food.id}
-                  onSelect={() => handleSelectFood(food)}
-                  className="flex items-center gap-2 cursor-pointer p-2"
+                  className="flex items-center justify-between cursor-pointer p-2"
                 >
-                  <div className="flex-1">
+                  <Link 
+                    to={`/aliment/${food.id}`} 
+                    className="flex-1 text-left"
+                  >
                     <div>{food.name}</div>
                     <div className="text-xs text-gray-500">{food.category}</div>
-                  </div>
+                  </Link>
+                  <button 
+                    onClick={(e) => handleAddToPlate(food, e)}
+                    className="ml-2 p-1 rounded-full hover:bg-gray-100"
+                    aria-label="Ajouter à mon assiette"
+                  >
+                    <Plus size={18} className="text-nutri-green" />
+                  </button>
                 </CommandItem>
               ))}
             </CommandList>
