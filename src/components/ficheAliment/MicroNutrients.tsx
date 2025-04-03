@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Food } from '@/types';
-import NutrientSection from './NutrientSection';
+import NutrientItem from './NutrientItem';
 
 interface MicroNutrientsProps {
   food: Food;
@@ -9,7 +9,7 @@ interface MicroNutrientsProps {
 
 export const MicroNutrients: React.FC<MicroNutrientsProps> = ({ food }) => {
   // Format labels for vitamins and minerals
-  const formatVitaminLabel = (key: string) => `Vitamine ${key.toUpperCase()}`;
+  const formatVitaminLabel = (key: string) => `Vit ${key.toUpperCase()}`;
   const formatMineralLabel = (key: string) => key.charAt(0).toUpperCase() + key.slice(1);
   const formatOligoLabel = (key: string) => key.charAt(0).toUpperCase() + key.slice(1);
   
@@ -20,40 +20,78 @@ export const MicroNutrients: React.FC<MicroNutrientsProps> = ({ food }) => {
   if (!hasVitamins && !hasMinerals && !hasOligoelements) {
     return null;
   }
+
+  // Filter out nutrients with value 0
+  const filterNonZeroNutrients = (nutrients: Record<string, number>) => {
+    return Object.entries(nutrients || {})
+      .filter(([_, value]) => value > 0)
+      .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
+  };
+  
+  const vitamines = hasVitamins ? filterNonZeroNutrients(food.nutrients.vitamines!) : {};
+  const mineraux = hasMinerals ? filterNonZeroNutrients(food.nutrients.mineraux!) : {};
+  const oligoelements = hasOligoelements ? filterNonZeroNutrients(food.nutrients.oligoelements!) : {};
   
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {hasVitamins && (
-        <NutrientSection
-          title="Vitamines"
-          nutrients={food.nutrients.vitamines || {}}
-          unit="mg"
-          color="bg-nutri-orange"
-          labelFormatter={formatVitaminLabel}
-          calculateProportions={true}
-        />
+    <div className="grid grid-cols-1 gap-6">
+      {Object.keys(vitamines).length > 0 && (
+        <div>
+          <h2 className="font-medium text-xl mb-3">Vitamines</h2>
+          <div className="flex flex-wrap">
+            {Object.entries(vitamines)
+              .sort(([, a], [, b]) => b - a) // Sort by value (highest first)
+              .map(([key, value]) => (
+                <NutrientItem 
+                  key={key}
+                  label={formatVitaminLabel(key)}
+                  value={value}
+                  unit="mg"
+                  nutrientKey={key}
+                  category="vitamines"
+                />
+              ))}
+          </div>
+        </div>
       )}
       
-      {hasMinerals && (
-        <NutrientSection
-          title="Minéraux"
-          nutrients={food.nutrients.mineraux || {}}
-          unit="mg"
-          color="bg-nutri-purple"
-          labelFormatter={formatMineralLabel}
-          calculateProportions={true}
-        />
+      {Object.keys(mineraux).length > 0 && (
+        <div>
+          <h2 className="font-medium text-xl mb-3">Minéraux</h2>
+          <div className="flex flex-wrap">
+            {Object.entries(mineraux)
+              .sort(([, a], [, b]) => b - a) // Sort by value (highest first)
+              .map(([key, value]) => (
+                <NutrientItem 
+                  key={key}
+                  label={formatMineralLabel(key)}
+                  value={value}
+                  unit="mg"
+                  nutrientKey={key}
+                  category="mineraux"
+                />
+              ))}
+          </div>
+        </div>
       )}
       
-      {hasOligoelements && (
-        <NutrientSection
-          title="Oligo-éléments"
-          nutrients={food.nutrients.oligoelements || {}}
-          unit="μg"
-          color="bg-nutri-blue"
-          labelFormatter={formatOligoLabel}
-          calculateProportions={true}
-        />
+      {Object.keys(oligoelements).length > 0 && (
+        <div>
+          <h2 className="font-medium text-xl mb-3">Oligo-éléments</h2>
+          <div className="flex flex-wrap">
+            {Object.entries(oligoelements)
+              .sort(([, a], [, b]) => b - a) // Sort by value (highest first)
+              .map(([key, value]) => (
+                <NutrientItem 
+                  key={key}
+                  label={formatOligoLabel(key)}
+                  value={value}
+                  unit="μg"
+                  nutrientKey={key}
+                  category="oligoelements"
+                />
+              ))}
+          </div>
+        </div>
       )}
     </div>
   );

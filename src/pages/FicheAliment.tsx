@@ -43,14 +43,11 @@ const FicheAliment: React.FC = () => {
         <FoodHeader food={food} />
         
         <div className="p-6 pt-0">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-            {/* Macronutriments */}
-            <div>
+          {/* Nutriments */}
+          <div className="mt-6">
+            <h2 className="text-2xl font-semibold mb-4">Composition nutritionnelle</h2>
+            <div className="space-y-6">
               <MacroNutrients food={food} />
-            </div>
-            
-            {/* Micronutriments (Vitamines et Minéraux) */}
-            <div className="col-span-1 md:col-span-2">
               <MicroNutrients food={food} />
             </div>
           </div>

@@ -1,38 +1,38 @@
 
 import React from 'react';
-import { ProgressBar } from '@/components/ui/ProgressBar';
+import getNutrientIcon from '@/components/ui/NutrientIcons';
 
 interface NutrientItemProps {
   label: string;
   value: number;
   unit: string;
-  color?: string;
-  percentage?: number;
+  nutrientKey?: string;
+  category?: string;
 }
+
+// Helper function to format numbers to 1 decimal place if needed
+const formatValue = (value: number): string => {
+  return Number.isInteger(value) ? value.toString() : value.toFixed(1);
+};
 
 export const NutrientItem: React.FC<NutrientItemProps> = ({ 
   label, 
   value, 
-  unit, 
-  color = 'bg-blue-500',
-  percentage = 0
+  unit,
+  nutrientKey,
+  category
 }) => {
+  // Don't display if value is 0
+  if (value <= 0) return null;
+  
+  const iconElement = category && nutrientKey ? 
+    getNutrientIcon(category, nutrientKey, 16, "mr-1.5") : null;
+  
   return (
-    <div>
-      <div className="flex justify-between items-center mb-1">
-        <span className="text-sm font-medium">{label}</span>
-        <div className="text-sm space-x-2">
-          <span>{value.toFixed(1)} {unit}</span>
-          {percentage > 0 && (
-            <span className="text-gray-500">({percentage.toFixed(0)}%)</span>
-          )}
-        </div>
-      </div>
-      <ProgressBar 
-        value={percentage} 
-        max={100} 
-        color={color}
-      />
+    <div className="inline-flex items-center mr-4 mb-2">
+      {iconElement}
+      <span className="text-sm font-medium">{label}</span>
+      <span className="text-sm ml-1">{formatValue(value)} {unit}</span>
     </div>
   );
 };
