@@ -25,15 +25,15 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   const [selectedFood, setSelectedFood] = useState<Food | null>(null);
   const [quantityDialogOpen, setQuantityDialogOpen] = useState(false);
 
-  // Update search results when search term changes
   useEffect(() => {
-    if (searchTerm.length > 0) {
-      // This will now use the startsWith() filter from foodUtils.ts
-      const results = getFilteredFoods(searchTerm).slice(0, 8); // Limit to 8 results
+    if (searchTerm.trim().length > 0) {
+      const results = getFilteredFoods(searchTerm.trim()).slice(0, 8);
+      console.log(`Search term: "${searchTerm}" - Found ${results.length} foods`);
       setSearchResults(results);
-      setShowSearchResults(results.length > 0);
+      setShowSearchResults(true);
     } else {
       setShowSearchResults(false);
+      setSearchResults([]);
     }
   }, [searchTerm]);
 
@@ -57,46 +57,46 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
         <input
           type="text"
-          placeholder="Rechercher un aliment à ajouter..."
+          placeholder="Rechercher un aliment (début du nom)..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full pl-10 pr-4 py-3 rounded-l-full border-y border-l border-gray-200 focus:outline-none focus:border-nutri-green focus:ring-1 focus:ring-nutri-green"
         />
 
-        {/* Search results dropdown */}
-        {showSearchResults && searchResults.length > 0 && (
+        {showSearchResults && (
           <div className="absolute z-10 w-full mt-1 rounded-md border border-gray-200 bg-white shadow-lg">
             <Command className="rounded-md">
               <CommandList>
-                {searchResults.map((food) => (
-                  <CommandItem
-                    key={food.id}
-                    className="flex items-center justify-between cursor-pointer p-2"
-                  >
-                    <Link 
-                      to={`/aliment/${food.id}`} 
-                      className="flex-1 text-left"
-                      onClick={() => {
-                        setSearchTerm('');
-                        setShowSearchResults(false);
-                      }}
+                {searchResults.length > 0 ? (
+                  searchResults.map((food) => (
+                    <CommandItem
+                      key={food.id}
+                      className="flex items-center justify-between cursor-pointer p-2"
                     >
-                      <div>{food.name}</div>
-                      <div className="text-xs text-gray-500">{food.category}</div>
-                    </Link>
-                    <button 
-                      onClick={(e) => handleAddToPlate(food, e)}
-                      className="ml-2 p-1 rounded-full hover:bg-gray-100"
-                      aria-label="Ajouter à mon assiette"
-                    >
-                      <Plus size={18} className="text-nutri-green" />
-                    </button>
-                  </CommandItem>
-                ))}
+                      <Link 
+                        to={`/aliment/${food.id}`} 
+                        className="flex-1 text-left"
+                        onClick={() => {
+                          setSearchTerm('');
+                          setShowSearchResults(false);
+                        }}
+                      >
+                        <div>{food.name}</div>
+                        <div className="text-xs text-gray-500">{food.category}</div>
+                      </Link>
+                      <button 
+                        onClick={(e) => handleAddToPlate(food, e)}
+                        className="ml-2 p-1 rounded-full hover:bg-gray-100"
+                        aria-label="Ajouter à mon assiette"
+                      >
+                        <Plus size={18} className="text-nutri-green" />
+                      </button>
+                    </CommandItem>
+                  ))
+                ) : (
+                  <CommandEmpty>Aucun aliment trouvé</CommandEmpty>
+                )}
               </CommandList>
-              {searchResults.length === 0 && (
-                <CommandEmpty>Aucun aliment trouvé</CommandEmpty>
-              )}
             </Command>
           </div>
         )}
@@ -125,7 +125,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Quantity Dialog for adding selected food to daily plate */}
       {selectedFood && (
         <AddToDailyPlateDialog
           food={selectedFood}

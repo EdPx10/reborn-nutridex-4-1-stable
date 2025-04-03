@@ -18,6 +18,8 @@ const Explorateur: React.FC = () => {
     // Reset foods array when filters change to prevent stale data
     const filtered = getFilteredFoods(searchTerm, selectedCategory, selectedBenefit, selectedSeason);
     setFoods(filtered);
+    // Console log to debug
+    console.log(`Search term: "${searchTerm}", found ${filtered.length} foods`);
   }, [searchTerm, selectedCategory, selectedBenefit, selectedSeason]);
 
   const handleSearch = (term: string) => {

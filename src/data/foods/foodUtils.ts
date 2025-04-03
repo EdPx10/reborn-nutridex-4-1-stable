@@ -6,24 +6,34 @@ export const getFilteredFoods = (
   benefit?: string,
   season?: string
 ) => {
-  return foods.filter(food => {
-    // Search filtering logic - match foods whose name STARTS WITH the search string
-    const matchesSearch = search === '' || 
-      food.name.toLowerCase().startsWith(search.toLowerCase());
-    
-    // Category filtering remains the same
-    const matchesCategory = !category || food.category === category;
-    
-    // Health benefit filtering remains the same
-    const matchesBenefit = !benefit || 
-      food.healthBenefits.includes(benefit as any);
-    
-    // Season filtering remains the same
-    const matchesSeason = !season || 
-      (food.seasons && food.seasons.includes(season as any));
-    
-    return matchesSearch && matchesCategory && matchesBenefit && matchesSeason;
-  });
+  let filteredFoods = [...foods];
+  
+  if (search && search.trim() !== '') {
+    const normalizedSearch = search.trim().toLowerCase();
+    filteredFoods = filteredFoods.filter(food => 
+      food.name.toLowerCase().startsWith(normalizedSearch)
+    );
+  }
+  
+  if (category) {
+    filteredFoods = filteredFoods.filter(food => food.category === category);
+  }
+  
+  if (benefit) {
+    filteredFoods = filteredFoods.filter(food => 
+      food.healthBenefits.includes(benefit as any)
+    );
+  }
+  
+  if (season) {
+    filteredFoods = filteredFoods.filter(food => 
+      food.seasons && food.seasons.includes(season as any)
+    );
+  }
+  
+  console.log(`Search: "${search}" - Found ${filteredFoods.length} matching foods`);
+  
+  return filteredFoods;
 };
 
 export const getFoodById = (id: string) => {

@@ -23,7 +23,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, searchTerm }) => {
     if (searchTerm.length > 0) {
       const results = getFilteredFoods(searchTerm).slice(0, 8); // Limit to 8 results
       setSearchResults(results);
-      setShowSearchResults(results.length > 0);
+      setShowSearchResults(true); // Always show results container when search term exists
     } else {
       setShowSearchResults(false);
     }
@@ -53,31 +53,39 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, searchTerm }) => {
       />
 
       {/* Search results dropdown */}
-      {showSearchResults && searchResults.length > 0 && (
+      {showSearchResults && (
         <div className="absolute z-10 w-full mt-1 rounded-md border border-gray-200 bg-white shadow-lg">
           <Command className="rounded-md">
             <CommandList>
-              {searchResults.map((food) => (
-                <CommandItem
-                  key={food.id}
-                  className="flex items-center justify-between cursor-pointer p-2"
-                >
-                  <Link 
-                    to={`/aliment/${food.id}`} 
-                    className="flex-1 text-left"
+              {searchResults.length > 0 ? (
+                searchResults.map((food) => (
+                  <CommandItem
+                    key={food.id}
+                    className="flex items-center justify-between cursor-pointer p-2"
                   >
-                    <div>{food.name}</div>
-                    <div className="text-xs text-gray-500">{food.category}</div>
-                  </Link>
-                  <button 
-                    onClick={(e) => handleAddToPlate(food, e)}
-                    className="ml-2 p-1 rounded-full hover:bg-gray-100"
-                    aria-label="Ajouter à mon assiette"
-                  >
-                    <Plus size={18} className="text-nutri-green" />
-                  </button>
-                </CommandItem>
-              ))}
+                    <Link 
+                      to={`/aliment/${food.id}`} 
+                      className="flex-1 text-left"
+                      onClick={() => {
+                        onSearch('');
+                        setShowSearchResults(false);
+                      }}
+                    >
+                      <div>{food.name}</div>
+                      <div className="text-xs text-gray-500">{food.category}</div>
+                    </Link>
+                    <button 
+                      onClick={(e) => handleAddToPlate(food, e)}
+                      className="ml-2 p-1 rounded-full hover:bg-gray-100"
+                      aria-label="Ajouter à mon assiette"
+                    >
+                      <Plus size={18} className="text-nutri-green" />
+                    </button>
+                  </CommandItem>
+                ))
+              ) : (
+                <CommandEmpty>Aucun aliment trouvé</CommandEmpty>
+              )}
             </CommandList>
           </Command>
         </div>
