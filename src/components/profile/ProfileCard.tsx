@@ -1,25 +1,37 @@
 
 import React, { useState } from 'react';
 import { UserProfile } from '@/types';
-import { Check, ChevronRight, User } from 'lucide-react';
+import { Check, ChevronRight, Edit, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import TabButton from './TabButton';
 import MacroNutrientSection from './MacroNutrientSection';
 import MicroNutrientSection from './MicroNutrientSection';
+import ProfileEditForm from './ProfileEditForm';
 
 interface ProfileCardProps {
   profile: UserProfile;
   isActive: boolean;
   onActivate: () => void;
+  onUpdate: (updatedProfile: UserProfile) => void;
 }
 
-const ProfileCard: React.FC<ProfileCardProps> = ({ profile, isActive, onActivate }) => {
+const ProfileCard: React.FC<ProfileCardProps> = ({ profile, isActive, onActivate, onUpdate }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'macros' | 'micros'>('macros');
+  const [isEditing, setIsEditing] = useState(false);
 
   const closeDialog = () => setIsOpen(false);
+  
+  const handleProfileUpdate = (formValues: any) => {
+    const updatedProfile = {
+      ...profile,
+      ...formValues
+    };
+    onUpdate(updatedProfile);
+    setIsEditing(false);
+  };
   
   return (
     <>
@@ -58,54 +70,81 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile, isActive, onActivate
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="text-2xl">{profile.name}</DialogTitle>
-          </DialogHeader>
-          
-          <div className="flex justify-center mt-2 mb-6">
-            <div className="inline-flex border rounded-lg overflow-hidden">
-              <TabButton 
-                active={activeTab === 'macros'} 
-                onClick={() => setActiveTab('macros')}
-              >
-                Macronutriments
-              </TabButton>
-              <TabButton 
-                active={activeTab === 'micros'} 
-                onClick={() => setActiveTab('micros')}
-              >
-                Micronutriments
-              </TabButton>
-            </div>
-          </div>
-          
-          {activeTab === 'macros' && (
-            <MacroNutrientSection profile={profile} />
+          {isEditing ? (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-2xl">Modifier le profil</DialogTitle>
+              </DialogHeader>
+              <ProfileEditForm 
+                profile={profile} 
+                onSubmit={handleProfileUpdate} 
+                onCancel={() => setIsEditing(false)} 
+              />
+            </>
+          ) : (
+            <>
+              <DialogHeader>
+                <div className="flex justify-between items-center">
+                  <DialogTitle className="text-2xl">{profile.name}</DialogTitle>
+                  {isActive && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setIsEditing(true)}
+                      className="h-8 w-8"
+                    >
+                      <Edit size={16} />
+                    </Button>
+                  )}
+                </div>
+              </DialogHeader>
+              
+              <div className="flex justify-center mt-2 mb-6">
+                <div className="inline-flex border rounded-lg overflow-hidden">
+                  <TabButton 
+                    active={activeTab === 'macros'} 
+                    onClick={() => setActiveTab('macros')}
+                  >
+                    Macronutriments
+                  </TabButton>
+                  <TabButton 
+                    active={activeTab === 'micros'} 
+                    onClick={() => setActiveTab('micros')}
+                  >
+                    Micronutriments
+                  </TabButton>
+                </div>
+              </div>
+              
+              {activeTab === 'macros' && (
+                <MacroNutrientSection profile={profile} />
+              )}
+              
+              {activeTab === 'micros' && (
+                <MicroNutrientSection profile={profile} />
+              )}
+              
+              <div className="flex justify-between mt-6 pt-4 border-t">
+                <Button 
+                  variant="outline" 
+                  onClick={closeDialog}
+                >
+                  Fermer
+                </Button>
+                
+                {!isActive && (
+                  <Button 
+                    onClick={() => {
+                      onActivate();
+                      closeDialog();
+                    }}
+                  >
+                    Activer ce profil
+                  </Button>
+                )}
+              </div>
+            </>
           )}
-          
-          {activeTab === 'micros' && (
-            <MicroNutrientSection profile={profile} />
-          )}
-          
-          <div className="flex justify-between mt-6 pt-4 border-t">
-            <Button 
-              variant="outline" 
-              onClick={closeDialog}
-            >
-              Fermer
-            </Button>
-            
-            {!isActive && (
-              <Button 
-                onClick={() => {
-                  onActivate();
-                  closeDialog();
-                }}
-              >
-                Activer ce profil
-              </Button>
-            )}
-          </div>
         </DialogContent>
       </Dialog>
     </>
