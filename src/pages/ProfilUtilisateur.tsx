@@ -31,6 +31,16 @@ const ProfilUtilisateur: React.FC = () => {
         mineraux: totalNutrients.mineraux,
         oligoelements: totalNutrients.oligoelements
       });
+    } else if (activeProfile && items.length === 0) {
+      updateNutrientIntake({
+        glucides: 0,
+        proteines: 0,
+        lipides: 0,
+        fibres: 0,
+        vitamines: {},
+        mineraux: {},
+        oligoelements: {}
+      });
     }
   }, [items, activeProfile, updateNutrientIntake]);
   
