@@ -28,8 +28,13 @@ const MicroNutrient: React.FC<MicroNutrientProps> = ({ label, category, nutrient
         color="bg-nutri-orange"
       />
       
-      <div className="text-right mt-1 text-sm text-gray-500">
-        {percentage}% de l'objectif
+      <div className="flex justify-between mt-1 text-sm">
+        <div className="text-gray-700">
+          {goal.current.toFixed(1)} {goal.unit}
+        </div>
+        <div className="text-gray-500">
+          {percentage}% de l'objectif
+        </div>
       </div>
     </div>
   );
