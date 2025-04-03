@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -18,15 +17,14 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { getNutrientIcon } from '@/components/ui/NutrientIcons';
 import { cn } from '@/lib/utils';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
-// Create schema for nutrition goals
 const createNutrientSchema = () => {
   return z.object({
     goal: z.coerce.number().min(0, { message: 'La valeur doit être positive' }),
   });
 };
 
-// Main form schema
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Le nom doit contenir au moins 2 caractères' }),
   age: z.coerce.number().min(1, { message: 'L\'âge doit être supérieur à 0' }).max(120, { message: 'L\'âge doit être inférieur à 120' }),
@@ -55,7 +53,6 @@ interface ProfileEditFormProps {
 const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profile, onSubmit, onCancel }) => {
   const [activeTab, setActiveTab] = useState<string>("personal");
   
-  // Transform profile format for form compatibility
   const defaultValues = {
     name: profile.name,
     age: profile.age,
@@ -82,15 +79,12 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profile, onSubmit, on
     },
   };
 
-  // Initialize form with profile values
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues,
   });
 
-  // Handle form submission
   const handleSubmit = (values: ProfileFormValues) => {
-    // Transform form data back to profile format
     const updatedProfile = {
       ...profile,
       name: values.name,
@@ -122,7 +116,6 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profile, onSubmit, on
     onSubmit(updatedProfile);
   };
 
-  // Helper to create nutrient field
   const renderNutrientField = (
     category: 'macro' | 'vitamines' | 'mineraux' | 'oligoelements',
     nutrientKey: string,
@@ -163,164 +156,166 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profile, onSubmit, on
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full grid grid-cols-2 mb-6">
-            <TabsTrigger value="personal">Profil</TabsTrigger>
-            <TabsTrigger value="goals">Objectifs Nutritionnels</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="personal" className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Prénom</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Prénom" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid grid-cols-2 gap-4">
+        <ScrollArea className="h-[500px] w-full pr-4">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="w-full grid grid-cols-2 mb-6">
+              <TabsTrigger value="personal">Profil</TabsTrigger>
+              <TabsTrigger value="goals">Objectifs Nutritionnels</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="personal" className="space-y-4">
               <FormField
                 control={form.control}
-                name="age"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Âge (ans)</FormLabel>
+                    <FormLabel>Prénom</FormLabel>
                     <FormControl>
-                      <Input type="number" placeholder="Âge" {...field} />
+                      <Input placeholder="Prénom" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
-              <FormField
-                control={form.control}
-                name="weight"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Poids (kg)</FormLabel>
-                    <FormControl>
-                      <Input type="number" placeholder="Poids" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
 
-            <FormField
-              control={form.control}
-              name="height"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Taille (cm)</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="Taille" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="gender"
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel>Sexe</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      className="flex gap-4"
-                    >
-                      <FormItem className="flex items-center space-x-3 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="homme" />
-                        </FormControl>
-                        <FormLabel className="font-normal">Homme</FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center space-x-3 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="femme" />
-                        </FormControl>
-                        <FormLabel className="font-normal">Femme</FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center space-x-3 space-y-0">
-                        <FormControl>
-                          <RadioGroupItem value="autre" />
-                        </FormControl>
-                        <FormLabel className="font-normal">Autre</FormLabel>
-                      </FormItem>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </TabsContent>
-          
-          <TabsContent value="goals" className="space-y-6">
-            <div className="rounded-lg border p-4">
-              <h3 className="font-medium mb-2">Macronutriments</h3>
-              
-              {renderNutrientField('macro', 'glucides', 'Glucides', 'g', 'goals.glucides.goal')}
-              {renderNutrientField('macro', 'proteines', 'Protéines', 'g', 'goals.proteines.goal')}
-              {renderNutrientField('macro', 'lipides', 'Lipides', 'g', 'goals.lipides.goal')}
-              {renderNutrientField('macro', 'fibres', 'Fibres', 'g', 'goals.fibres.goal')}
-            </div>
-            
-            <div className="rounded-lg border p-4">
-              <h3 className="font-medium mb-2">Vitamines</h3>
-              
-              {Object.entries(profile.goals.vitamines).map(([key, value]) => (
-                renderNutrientField(
-                  'vitamines', 
-                  key, 
-                  `Vitamine ${key.toUpperCase()}`, 
-                  value.unit, 
-                  `goals.vitamines.${key}.goal`
-                )
-              ))}
-            </div>
-            
-            <div className="rounded-lg border p-4">
-              <h3 className="font-medium mb-2">Minéraux</h3>
-              
-              {Object.entries(profile.goals.mineraux).map(([key, value]) => (
-                renderNutrientField(
-                  'mineraux', 
-                  key, 
-                  key.charAt(0).toUpperCase() + key.slice(1), 
-                  value.unit, 
-                  `goals.mineraux.${key}.goal`
-                )
-              ))}
-            </div>
-            
-            {Object.keys(profile.goals.oligoelements).length > 0 && (
-              <div className="rounded-lg border p-4">
-                <h3 className="font-medium mb-2">Oligo-éléments</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="age"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Âge (ans)</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="Âge" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 
-                {Object.entries(profile.goals.oligoelements).map(([key, value]) => (
+                <FormField
+                  control={form.control}
+                  name="weight"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Poids (kg)</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="Poids" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="height"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Taille (cm)</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="Taille" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="gender"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel>Sexe</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        className="flex gap-4"
+                      >
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="homme" />
+                          </FormControl>
+                          <FormLabel className="font-normal">Homme</FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="femme" />
+                          </FormControl>
+                          <FormLabel className="font-normal">Femme</FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="autre" />
+                          </FormControl>
+                          <FormLabel className="font-normal">Autre</FormLabel>
+                        </FormItem>
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </TabsContent>
+            
+            <TabsContent value="goals" className="space-y-6">
+              <div className="rounded-lg border p-4">
+                <h3 className="font-medium mb-2">Macronutriments</h3>
+                
+                {renderNutrientField('macro', 'glucides', 'Glucides', 'g', 'goals.glucides.goal')}
+                {renderNutrientField('macro', 'proteines', 'Protéines', 'g', 'goals.proteines.goal')}
+                {renderNutrientField('macro', 'lipides', 'Lipides', 'g', 'goals.lipides.goal')}
+                {renderNutrientField('macro', 'fibres', 'Fibres', 'g', 'goals.fibres.goal')}
+              </div>
+              
+              <div className="rounded-lg border p-4">
+                <h3 className="font-medium mb-2">Vitamines</h3>
+                
+                {Object.entries(profile.goals.vitamines).map(([key, value]) => (
                   renderNutrientField(
-                    'oligoelements', 
+                    'vitamines', 
                     key, 
-                    key.charAt(0).toUpperCase() + key.slice(1), 
+                    `Vitamine ${key.toUpperCase()}`, 
                     value.unit, 
-                    `goals.oligoelements.${key}.goal`
+                    `goals.vitamines.${key}.goal`
                   )
                 ))}
               </div>
-            )}
-          </TabsContent>
-        </Tabs>
+              
+              <div className="rounded-lg border p-4">
+                <h3 className="font-medium mb-2">Minéraux</h3>
+                
+                {Object.entries(profile.goals.mineraux).map(([key, value]) => (
+                  renderNutrientField(
+                    'mineraux', 
+                    key, 
+                    key.charAt(0).toUpperCase() + key.slice(1), 
+                    value.unit, 
+                    `goals.mineraux.${key}.goal`
+                  )
+                ))}
+              </div>
+              
+              {Object.keys(profile.goals.oligoelements).length > 0 && (
+                <div className="rounded-lg border p-4">
+                  <h3 className="font-medium mb-2">Oligo-éléments</h3>
+                  
+                  {Object.entries(profile.goals.oligoelements).map(([key, value]) => (
+                    renderNutrientField(
+                      'oligoelements', 
+                      key, 
+                      key.charAt(0).toUpperCase() + key.slice(1), 
+                      value.unit, 
+                      `goals.oligoelements.${key}.goal`
+                    )
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        </ScrollArea>
 
         <div className="flex justify-end space-x-2 pt-4">
           <Button type="button" variant="outline" onClick={onCancel}>
