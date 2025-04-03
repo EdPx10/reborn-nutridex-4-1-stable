@@ -20,28 +20,19 @@ const ProfilUtilisateur: React.FC = () => {
   
   // Synchroniser les apports nutritionnels avec le profil utilisateur
   useEffect(() => {
-    if (activeProfile && items.length > 0) {
-      const totalNutrients = calculateTotalNutrients(items);
-      updateNutrientIntake({
-        glucides: totalNutrients.glucides,
-        proteines: totalNutrients.proteines,
-        lipides: totalNutrients.lipides,
-        fibres: totalNutrients.fibres,
-        vitamines: totalNutrients.vitamines,
-        mineraux: totalNutrients.mineraux,
-        oligoelements: totalNutrients.oligoelements
-      });
-    } else if (activeProfile && items.length === 0) {
-      updateNutrientIntake({
-        glucides: 0,
-        proteines: 0,
-        lipides: 0,
-        fibres: 0,
-        vitamines: {},
-        mineraux: {},
-        oligoelements: {}
-      });
-    }
+    if (!activeProfile) return;
+
+    const totalNutrients = calculateTotalNutrients(items);
+
+    updateNutrientIntake({
+      glucides: totalNutrients.glucides || 0,
+      proteines: totalNutrients.proteines || 0,
+      lipides: totalNutrients.lipides || 0,
+      fibres: totalNutrients.fibres || 0,
+      vitamines: totalNutrients.vitamines || {},
+      mineraux: totalNutrients.mineraux || {},
+      oligoelements: totalNutrients.oligoelements || {}
+    });
   }, [items, activeProfile, updateNutrientIntake]);
   
   // Si aucun profil actif, afficher un message
