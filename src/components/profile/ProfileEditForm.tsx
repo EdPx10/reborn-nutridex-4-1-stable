@@ -1,23 +1,18 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { UserProfile } from '@/types';
 import { Button } from '@/components/ui/button';
 import {
   Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { renderNutrientField } from './NutrientFieldRenderer';
-import { Separator } from '@/components/ui/separator';
+import PersonalInfoFields from './PersonalInfoFields';
+import MacronutrientFields from './MacronutrientFields';
+import MicronutrientFields from './MicronutrientFields';
 
 const createNutrientSchema = () => {
   return z.object({
@@ -112,57 +107,6 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profile, onSubmit, on
     resolver: zodResolver(formSchema),
     defaultValues,
   });
-  
-  // Watch lipid component values to update totals automatically
-  const saturatedGoal = useWatch({
-    control: form.control,
-    name: "goals.lipids.saturated.goal",
-    defaultValue: defaultLipidGoals.saturated.goal
-  });
-  
-  const monoUnsaturatedGoal = useWatch({
-    control: form.control,
-    name: "goals.lipids.monoUnsaturated.goal",
-    defaultValue: defaultLipidGoals.monoUnsaturated.goal
-  });
-  
-  const omega3Goal = useWatch({
-    control: form.control,
-    name: "goals.lipids.omega3.goal",
-    defaultValue: defaultLipidGoals.omega3.goal
-  });
-  
-  const omega6Goal = useWatch({
-    control: form.control,
-    name: "goals.lipids.omega6.goal",
-    defaultValue: defaultLipidGoals.omega6.goal
-  });
-  
-  // Calculate polyunsaturated automatically from omega3 + omega6
-  const polyUnsaturatedGoal = Number(omega3Goal) + Number(omega6Goal);
-  
-  // Format the polyunsaturated value with at most 1 decimal place
-  const formattedPolyUnsaturatedGoal = Number.isInteger(polyUnsaturatedGoal) 
-    ? polyUnsaturatedGoal.toString() 
-    : polyUnsaturatedGoal.toFixed(1);
-  
-  // Update polyunsaturated value when omega3 or omega6 changes
-  useEffect(() => {
-    form.setValue("goals.lipids.polyUnsaturated.goal", polyUnsaturatedGoal);
-  }, [omega3Goal, omega6Goal, form]);
-  
-  // Calculate total lipids as sum of components
-  const totalLipids = Number(saturatedGoal) + Number(monoUnsaturatedGoal) + polyUnsaturatedGoal;
-  
-  // Format total lipids with at most 1 decimal place
-  const formattedTotalLipids = Number.isInteger(totalLipids) 
-    ? totalLipids.toString() 
-    : totalLipids.toFixed(1);
-  
-  // Update total lipids value when components change
-  useEffect(() => {
-    form.setValue("goals.lipides.goal", totalLipids);
-  }, [saturatedGoal, monoUnsaturatedGoal, polyUnsaturatedGoal, form]);
 
   const handleSubmit = (values: ProfileFormValues) => {
     // Ensure final values adhere to the calculated relationships
@@ -232,250 +176,12 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profile, onSubmit, on
             </TabsList>
             
             <TabsContent value="personal" className="space-y-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Prénom</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Prénom" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="age"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Âge (ans)</FormLabel>
-                      <FormControl>
-                        <Input type="number" placeholder="Âge" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="weight"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Poids (kg)</FormLabel>
-                      <FormControl>
-                        <Input type="number" placeholder="Poids" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name="height"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Taille (cm)</FormLabel>
-                    <FormControl>
-                      <Input type="number" placeholder="Taille" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="gender"
-                render={({ field }) => (
-                  <FormItem className="space-y-3">
-                    <FormLabel>Sexe</FormLabel>
-                    <FormControl>
-                      <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className="flex gap-4"
-                      >
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="homme" />
-                          </FormControl>
-                          <FormLabel className="font-normal">Homme</FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="femme" />
-                          </FormControl>
-                          <FormLabel className="font-normal">Femme</FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="autre" />
-                          </FormControl>
-                          <FormLabel className="font-normal">Autre</FormLabel>
-                        </FormItem>
-                      </RadioGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <PersonalInfoFields form={form} />
             </TabsContent>
             
             <TabsContent value="goals" className="space-y-6">
-              <div className="rounded-lg border p-4">
-                <h3 className="font-medium mb-2">Macronutriments</h3>
-                
-                {renderNutrientField({
-                  category: 'macro',
-                  nutrientKey: 'glucides',
-                  label: 'Glucides',
-                  unit: 'g',
-                  path: 'goals.glucides.goal',
-                  form
-                })}
-                {renderNutrientField({
-                  category: 'macro',
-                  nutrientKey: 'proteines',
-                  label: 'Protéines',
-                  unit: 'g',
-                  path: 'goals.proteines.goal',
-                  form
-                })}
-                
-                {/* Lipides total - rendu en lecture seule */}
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center gap-2">
-                    <label className="text-sm font-medium">Lipides (Total)</label>
-                    <span className="text-xs text-gray-500">g</span>
-                  </div>
-                  <Input
-                    value={formattedTotalLipids}
-                    readOnly
-                    disabled
-                    className="bg-gray-100"
-                  />
-                  <p className="text-xs text-gray-500">
-                    Calculé automatiquement comme la somme des acides gras
-                  </p>
-                </div>
-                
-                <Separator className="my-3" />
-                <h4 className="text-sm text-gray-500 mb-2">Lipides détaillés</h4>
-                
-                {renderNutrientField({
-                  category: 'macro',
-                  nutrientKey: 'lipides',
-                  label: 'Acides gras saturés (AGS)',
-                  unit: 'g',
-                  path: 'goals.lipids.saturated.goal',
-                  form
-                })}
-                {renderNutrientField({
-                  category: 'macro',
-                  nutrientKey: 'lipides',
-                  label: 'Acides gras mono-insaturés (AMS)',
-                  unit: 'g',
-                  path: 'goals.lipids.monoUnsaturated.goal',
-                  form
-                })}
-                
-                {/* Poly-insaturés - rendu en lecture seule car calculé automatiquement */}
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center gap-2">
-                    <label className="text-sm font-medium">Acides gras poly-insaturés (AGP)</label>
-                    <span className="text-xs text-gray-500">g</span>
-                  </div>
-                  <Input
-                    value={formattedPolyUnsaturatedGoal}
-                    readOnly
-                    disabled
-                    className="bg-gray-100"
-                  />
-                  <p className="text-xs text-gray-500">
-                    Calculé automatiquement comme Oméga-3 + Oméga-6
-                  </p>
-                </div>
-                
-                {renderNutrientField({
-                  category: 'macro',
-                  nutrientKey: 'lipides',
-                  label: 'Oméga-3',
-                  unit: 'g',
-                  path: 'goals.lipids.omega3.goal',
-                  form
-                })}
-                {renderNutrientField({
-                  category: 'macro',
-                  nutrientKey: 'lipides',
-                  label: 'Oméga-6',
-                  unit: 'g',
-                  path: 'goals.lipids.omega6.goal',
-                  form
-                })}
-
-                {renderNutrientField({
-                  category: 'macro',
-                  nutrientKey: 'fibres',
-                  label: 'Fibres',
-                  unit: 'g',
-                  path: 'goals.fibres.goal',
-                  form
-                })}
-              </div>
-              
-              <div className="rounded-lg border p-4">
-                <h3 className="font-medium mb-2">Vitamines</h3>
-                
-                {Object.entries(profile.goals.vitamines).map(([key, value]) => (
-                  renderNutrientField({
-                    category: 'vitamines',
-                    nutrientKey: key,
-                    label: `Vitamine ${key.toUpperCase()}`,
-                    unit: value.unit,
-                    path: `goals.vitamines.${key}.goal`,
-                    form
-                  })
-                ))}
-              </div>
-              
-              <div className="rounded-lg border p-4">
-                <h3 className="font-medium mb-2">Minéraux</h3>
-                
-                {Object.entries(profile.goals.mineraux).map(([key, value]) => (
-                  renderNutrientField({
-                    category: 'mineraux',
-                    nutrientKey: key,
-                    label: key.charAt(0).toUpperCase() + key.slice(1),
-                    unit: value.unit,
-                    path: `goals.mineraux.${key}.goal`,
-                    form
-                  })
-                ))}
-              </div>
-              
-              {Object.keys(profile.goals.oligoelements).length > 0 && (
-                <div className="rounded-lg border p-4">
-                  <h3 className="font-medium mb-2">Oligo-éléments</h3>
-                  
-                  {Object.entries(profile.goals.oligoelements).map(([key, value]) => (
-                    renderNutrientField({
-                      category: 'oligoelements',
-                      nutrientKey: key,
-                      label: key.charAt(0).toUpperCase() + key.slice(1),
-                      unit: value.unit,
-                      path: `goals.oligoelements.${key}.goal`,
-                      form
-                    })
-                  ))}
-                </div>
-              )}
+              <MacronutrientFields form={form} />
+              <MicronutrientFields form={form} profile={profile} />
             </TabsContent>
           </Tabs>
         </ScrollArea>
