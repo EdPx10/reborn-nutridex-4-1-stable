@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { Plus, Edit } from 'lucide-react';
@@ -33,6 +32,7 @@ const ProfilUtilisateur: React.FC = () => {
       proteines: totalNutrients.proteines || 0,
       lipides: totalNutrients.lipides || 0,
       fibres: totalNutrients.fibres || 0,
+      lipids: totalNutrients.lipids,
       vitamines: totalNutrients.vitamines || {},
       mineraux: totalNutrients.mineraux || {},
       oligoelements: totalNutrients.oligoelements || {}

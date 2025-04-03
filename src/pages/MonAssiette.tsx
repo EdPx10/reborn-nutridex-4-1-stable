@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useDailyPlateStore } from '@/store/dailyPlateStore';
@@ -24,6 +23,7 @@ const MonAssiette: React.FC = () => {
         proteines: totalNutrients.proteines,
         lipides: totalNutrients.lipides,
         fibres: totalNutrients.fibres,
+        lipids: totalNutrients.lipids,
         vitamines: { ...totalNutrients.vitamines },
         mineraux: { ...totalNutrients.mineraux },
         oligoelements: { ...totalNutrients.oligoelements }
@@ -31,7 +31,7 @@ const MonAssiette: React.FC = () => {
       
       updateNutrientIntake(nutrientsSnapshot);
     }
-  }, [items, activeProfile]); // Dépendance uniquement sur items et activeProfile
+  }, [items, activeProfile, updateNutrientIntake]);
   
   return (
     <div className="animate-fade-in">

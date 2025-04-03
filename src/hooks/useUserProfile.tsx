@@ -88,6 +88,9 @@ export const useUserProfile = () => {
     return profiles.find(profile => profile.id === activeProfileId) || DEFAULT_PROFILE;
   };
 
+  // Added getter for active profile to match usage in components
+  const activeProfile = getActiveProfile();
+
   const updateProfile = (updatedProfile: UserProfile) => {
     setProfiles(profiles.map(profile => 
       profile.id === updatedProfile.id ? updatedProfile : profile
@@ -126,14 +129,92 @@ export const useUserProfile = () => {
     return false;
   };
 
+  // Added missing method needed by MonAssiette.tsx and ProfilUtilisateur.tsx
+  const updateNutrientIntake = (nutrients: {
+    glucides: number;
+    proteines: number;
+    lipides: number;
+    fibres: number;
+    vitamines: {
+      [key: string]: number;
+    };
+    mineraux: {
+      [key: string]: number;
+    };
+    oligoelements: {
+      [key: string]: number;
+    };
+  }) => {
+    const updatedProfile = { ...activeProfile };
+    
+    // Update macronutrient values
+    updatedProfile.goals.glucides.current = nutrients.glucides;
+    updatedProfile.goals.proteines.current = nutrients.proteines;
+    updatedProfile.goals.lipides.current = nutrients.lipides;
+    updatedProfile.goals.fibres.current = nutrients.fibres;
+    
+    // Update detailed lipid values if the data is available
+    if (nutrients.lipids) {
+      updatedProfile.goals.lipids = {
+        saturated: { 
+          ...updatedProfile.goals.lipids!.saturated, 
+          current: nutrients.lipids.saturated 
+        },
+        monoUnsaturated: { 
+          ...updatedProfile.goals.lipids!.monoUnsaturated, 
+          current: nutrients.lipids.monoUnsaturated 
+        },
+        polyUnsaturated: { 
+          ...updatedProfile.goals.lipids!.polyUnsaturated, 
+          current: nutrients.lipids.polyUnsaturated 
+        },
+        omega3: { 
+          ...updatedProfile.goals.lipids!.omega3, 
+          current: nutrients.lipids.omega3 
+        },
+        omega6: { 
+          ...updatedProfile.goals.lipids!.omega6, 
+          current: nutrients.lipids.omega6 
+        },
+      };
+    }
+    
+    // Update micronutrient values
+    Object.keys(nutrients.vitamines).forEach(key => {
+      if (updatedProfile.goals.vitamines[key]) {
+        updatedProfile.goals.vitamines[key].current = nutrients.vitamines[key];
+      }
+    });
+    
+    Object.keys(nutrients.mineraux).forEach(key => {
+      if (updatedProfile.goals.mineraux[key]) {
+        updatedProfile.goals.mineraux[key].current = nutrients.mineraux[key];
+      }
+    });
+    
+    Object.keys(nutrients.oligoelements).forEach(key => {
+      if (updatedProfile.goals.oligoelements[key]) {
+        updatedProfile.goals.oligoelements[key].current = nutrients.oligoelements[key];
+      }
+    });
+    
+    updateProfile(updatedProfile);
+  };
+
+  // Added alias for setActiveProfile to match usage in ProfilUtilisateur.tsx
+  const setActiveProfileById = setActiveProfile;
+
   return {
     profiles,
     activeProfileId,
+    activeProfile,
     getActiveProfile,
     updateProfile,
     addProfile,
     removeProfile,
     setActiveProfile,
+    setActiveProfileById,
+    updateNutrientIntake,
   };
 };
 
