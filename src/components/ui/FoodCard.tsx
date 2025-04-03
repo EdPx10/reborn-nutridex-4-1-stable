@@ -98,7 +98,7 @@ export const FoodCard: React.FC<FoodCardProps> = ({ food }) => {
           <div className="p-3">
             <h3 className="font-medium text-lg">{name}</h3>
             
-            <div className="grid grid-cols-3 gap-2 my-2 text-sm">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 my-2 text-xs sm:text-sm">
               <div>
                 <p className="text-gray-500">Glucides</p>
                 <p className="font-medium">{nutrients.glucides.toFixed(2)}g</p>
@@ -110,6 +110,10 @@ export const FoodCard: React.FC<FoodCardProps> = ({ food }) => {
               <div>
                 <p className="text-gray-500">Lipides</p>
                 <p className="font-medium">{nutrients.lipides.toFixed(2)}g</p>
+              </div>
+              <div>
+                <p className="text-gray-500">Fibres</p>
+                <p className="font-medium">{(nutrients.fibres || 0).toFixed(2)}g</p>
               </div>
             </div>
             
