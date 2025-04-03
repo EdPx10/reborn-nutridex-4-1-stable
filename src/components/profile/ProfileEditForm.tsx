@@ -139,7 +139,12 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profile, onSubmit, on
   });
   
   // Calculate polyunsaturated automatically from omega3 + omega6
-  const polyUnsaturatedGoal = omega3Goal + omega6Goal;
+  const polyUnsaturatedGoal = Number(omega3Goal) + Number(omega6Goal);
+  
+  // Format the polyunsaturated value with at most 1 decimal place
+  const formattedPolyUnsaturatedGoal = Number.isInteger(polyUnsaturatedGoal) 
+    ? polyUnsaturatedGoal.toString() 
+    : polyUnsaturatedGoal.toFixed(1);
   
   // Update polyunsaturated value when omega3 or omega6 changes
   useEffect(() => {
@@ -147,7 +152,12 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profile, onSubmit, on
   }, [omega3Goal, omega6Goal, form]);
   
   // Calculate total lipids as sum of components
-  const totalLipids = saturatedGoal + monoUnsaturatedGoal + polyUnsaturatedGoal;
+  const totalLipids = Number(saturatedGoal) + Number(monoUnsaturatedGoal) + polyUnsaturatedGoal;
+  
+  // Format total lipids with at most 1 decimal place
+  const formattedTotalLipids = Number.isInteger(totalLipids) 
+    ? totalLipids.toString() 
+    : totalLipids.toFixed(1);
   
   // Update total lipids value when components change
   useEffect(() => {
@@ -346,7 +356,7 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profile, onSubmit, on
                     <span className="text-xs text-gray-500">g</span>
                   </div>
                   <Input
-                    value={totalLipids}
+                    value={formattedTotalLipids}
                     readOnly
                     disabled
                     className="bg-gray-100"
@@ -383,7 +393,7 @@ const ProfileEditForm: React.FC<ProfileEditFormProps> = ({ profile, onSubmit, on
                     <span className="text-xs text-gray-500">g</span>
                   </div>
                   <Input
-                    value={polyUnsaturatedGoal}
+                    value={formattedPolyUnsaturatedGoal}
                     readOnly
                     disabled
                     className="bg-gray-100"
