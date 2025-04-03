@@ -7,9 +7,9 @@ export const getFilteredFoods = (
   season?: string
 ) => {
   return foods.filter(food => {
-    // Search filtering logic - only match foods whose name contains the search string
+    // Search filtering logic - match foods whose name STARTS WITH the search string
     const matchesSearch = search === '' || 
-      food.name.toLowerCase().includes(search.toLowerCase());
+      food.name.toLowerCase().startsWith(search.toLowerCase());
     
     // Category filtering remains the same
     const matchesCategory = !category || food.category === category;
