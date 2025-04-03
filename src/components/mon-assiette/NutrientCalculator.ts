@@ -19,7 +19,7 @@ export const calculateTotalNutrients = (items: PlateItem[]) => {
     oligoelements: {} as { [key: string]: number }
   };
   
-  return items.reduce((total, item) => {
+  const totals = items.reduce((total, item) => {
     const { food, quantity, unit } = item;
     const conversionFactor = (unit === food.portion.unit) 
       ? quantity / food.portion.amount 
@@ -28,16 +28,19 @@ export const calculateTotalNutrients = (items: PlateItem[]) => {
     // Macronutriments de base
     total.glucides += (food.nutrients.glucides || 0) * conversionFactor;
     total.proteines += (food.nutrients.proteines || 0) * conversionFactor;
-    total.lipides += (food.nutrients.lipides || 0) * conversionFactor;
     total.fibres += (food.nutrients.fibres || 0) * conversionFactor;
     
     // Lipides détaillés
     if (food.nutrients.lipids) {
       total.lipids.saturated += (food.nutrients.lipids.saturated || 0) * conversionFactor;
       total.lipids.monoUnsaturated += (food.nutrients.lipids.monoUnsaturated || 0) * conversionFactor;
-      total.lipids.polyUnsaturated += (food.nutrients.lipids.polyUnsaturated || 0) * conversionFactor;
       total.lipids.omega3 += (food.nutrients.lipids.omega3 || 0) * conversionFactor;
       total.lipids.omega6 += (food.nutrients.lipids.omega6 || 0) * conversionFactor;
+    } else {
+      // Si les lipides détaillés ne sont pas disponibles, utiliser l'approximation de base
+      total.lipids.saturated += (food.nutrients.lipides || 0) * 0.33 * conversionFactor;
+      total.lipids.monoUnsaturated += (food.nutrients.lipides || 0) * 0.33 * conversionFactor;
+      total.lipids.polyUnsaturated += (food.nutrients.lipides || 0) * 0.34 * conversionFactor;
     }
     
     // Vitamines
@@ -72,4 +75,14 @@ export const calculateTotalNutrients = (items: PlateItem[]) => {
     
     return total;
   }, initialTotal);
+
+  // Calculer les AGP comme Oméga-3 + Oméga-6
+  totals.lipids.polyUnsaturated = totals.lipids.omega3 + totals.lipids.omega6;
+  
+  // Calculer les lipides totaux comme somme des composants
+  totals.lipides = totals.lipids.saturated + 
+                   totals.lipids.monoUnsaturated + 
+                   totals.lipids.polyUnsaturated;
+  
+  return totals;
 };

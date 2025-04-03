@@ -17,7 +17,7 @@ const DEFAULT_PROFILE: UserProfile = {
       monoUnsaturated: { current: 0, goal: 26, unit: 'g' }, // ~1/3 des lipides totaux
       polyUnsaturated: { current: 0, goal: 26, unit: 'g' }, // ~1/3 des lipides totaux
       omega3: { current: 0, goal: 2, unit: 'g' }, // Recommandation AHA
-      omega6: { current: 0, goal: 10, unit: 'g' } // Recommandation générale
+      omega6: { current: 0, goal: 24, unit: 'g' } // Restant des poly-insaturés
     },
     fibres: { current: 0, goal: 30, unit: 'g' },
     vitamines: {
@@ -58,11 +58,22 @@ export const useUserProfile = () => {
             profile.goals.lipids = {
               saturated: { current: 0, goal: Math.round(totalLipids * 0.33), unit: 'g' },
               monoUnsaturated: { current: 0, goal: Math.round(totalLipids * 0.33), unit: 'g' },
-              polyUnsaturated: { current: 0, goal: Math.round(totalLipids * 0.33), unit: 'g' },
+              polyUnsaturated: { current: 0, goal: Math.round(totalLipids * 0.34), unit: 'g' },
               omega3: { current: 0, goal: 2, unit: 'g' },
-              omega6: { current: 0, goal: 10, unit: 'g' }
+              omega6: { current: 0, goal: Math.round(totalLipids * 0.34) - 2, unit: 'g' }
             };
           }
+          
+          // S'assurer que les valeurs sont cohérentes
+          const omega3Goal = profile.goals.lipids.omega3.goal;
+          const omega6Goal = profile.goals.lipids.omega6.goal;
+          profile.goals.lipids.polyUnsaturated.goal = omega3Goal + omega6Goal;
+          
+          profile.goals.lipides.goal = 
+            profile.goals.lipids.saturated.goal + 
+            profile.goals.lipids.monoUnsaturated.goal + 
+            profile.goals.lipids.polyUnsaturated.goal;
+            
           return profile;
         });
         setProfiles(updatedProfiles);
@@ -91,6 +102,20 @@ export const useUserProfile = () => {
   const activeProfile = getActiveProfile();
 
   const updateProfile = (updatedProfile: UserProfile) => {
+    // S'assurer que les valeurs de lipides sont cohérentes
+    if (updatedProfile.goals.lipids) {
+      // Calculer les AGP comme Oméga-3 + Oméga-6
+      updatedProfile.goals.lipids.polyUnsaturated.goal = 
+        updatedProfile.goals.lipids.omega3.goal + 
+        updatedProfile.goals.lipids.omega6.goal;
+      
+      // Calculer les lipides totaux comme somme des composants
+      updatedProfile.goals.lipides.goal = 
+        updatedProfile.goals.lipids.saturated.goal + 
+        updatedProfile.goals.lipids.monoUnsaturated.goal + 
+        updatedProfile.goals.lipids.polyUnsaturated.goal;
+    }
+    
     setProfiles(profiles.map(profile => 
       profile.id === updatedProfile.id ? updatedProfile : profile
     ));
@@ -153,14 +178,9 @@ export const useUserProfile = () => {
   }) => {
     const updatedProfile = { ...activeProfile };
     
-    // Update macronutrient values
-    updatedProfile.goals.glucides.current = nutrients.glucides;
-    updatedProfile.goals.proteines.current = nutrients.proteines;
-    updatedProfile.goals.lipides.current = nutrients.lipides;
-    updatedProfile.goals.fibres.current = nutrients.fibres;
-    
-    // Update detailed lipid values if the data is available
+    // Mettre à jour les lipides détaillés en priorité s'ils sont disponibles
     if (nutrients.lipids) {
+      // Mettre à jour les valeurs d'acides gras individuels
       updatedProfile.goals.lipids = {
         saturated: { 
           ...updatedProfile.goals.lipids!.saturated, 
@@ -172,7 +192,7 @@ export const useUserProfile = () => {
         },
         polyUnsaturated: { 
           ...updatedProfile.goals.lipids!.polyUnsaturated, 
-          current: nutrients.lipids.polyUnsaturated 
+          current: nutrients.lipids.omega3 + nutrients.lipids.omega6 
         },
         omega3: { 
           ...updatedProfile.goals.lipids!.omega3, 
@@ -183,7 +203,29 @@ export const useUserProfile = () => {
           current: nutrients.lipids.omega6 
         },
       };
+      
+      // Calculer les lipides totaux comme somme des composants
+      updatedProfile.goals.lipides.current = 
+        nutrients.lipids.saturated + 
+        nutrients.lipids.monoUnsaturated + 
+        (nutrients.lipids.omega3 + nutrients.lipids.omega6);
+    } else {
+      // Fallback si les lipides détaillés ne sont pas fournis
+      updatedProfile.goals.lipides.current = nutrients.lipides;
+      
+      // Répartir approximativement les lipides totaux entre les différents types
+      const totalLipids = nutrients.lipides;
+      updatedProfile.goals.lipids!.saturated.current = totalLipids * 0.33;
+      updatedProfile.goals.lipids!.monoUnsaturated.current = totalLipids * 0.33;
+      updatedProfile.goals.lipids!.polyUnsaturated.current = totalLipids * 0.34;
+      updatedProfile.goals.lipids!.omega3.current = totalLipids * 0.05;
+      updatedProfile.goals.lipids!.omega6.current = totalLipids * 0.29;
     }
+    
+    // Update remaining macronutrient values
+    updatedProfile.goals.glucides.current = nutrients.glucides;
+    updatedProfile.goals.proteines.current = nutrients.proteines;
+    updatedProfile.goals.fibres.current = nutrients.fibres;
     
     // Update micronutrient values
     Object.keys(nutrients.vitamines).forEach(key => {

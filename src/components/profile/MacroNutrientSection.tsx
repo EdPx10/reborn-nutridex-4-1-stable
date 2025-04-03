@@ -76,6 +76,20 @@ const MacroNutrientSection: React.FC<MacroNutrientSectionProps> = ({ profile }) 
                   showIcon={false}
                   indent={true}
                 />
+                
+                {/* Afficher la relation mathématique */}
+                <div className="text-xs text-gray-500 ml-6 mt-2">
+                  AGP (Total) = Oméga-3 + Oméga-6 = {profile.goals.lipids!.omega3.current + profile.goals.lipids!.omega6.current} g
+                </div>
+              </div>
+              
+              {/* Afficher la relation mathématique */}
+              <div className="text-xs text-gray-500 mt-2">
+                Lipides (Total) = AGS + AMS + AGP = {
+                  profile.goals.lipids!.saturated.current + 
+                  profile.goals.lipids!.monoUnsaturated.current + 
+                  profile.goals.lipids!.polyUnsaturated.current
+                } g
               </div>
             </div>
           )}

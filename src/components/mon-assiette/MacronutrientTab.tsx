@@ -53,9 +53,9 @@ export const MacronutrientTab: React.FC<MacronutrientTabProps> = ({
   const lipidGoal = activeProfile.goals.lipides.goal || 78;
   const saturatedGoal = activeProfile.goals.lipids?.saturated.goal || Math.round(lipidGoal * 0.33);
   const monoUnsaturatedGoal = activeProfile.goals.lipids?.monoUnsaturated.goal || Math.round(lipidGoal * 0.33);
-  const polyUnsaturatedGoal = activeProfile.goals.lipids?.polyUnsaturated.goal || Math.round(lipidGoal * 0.33);
+  const polyUnsaturatedGoal = activeProfile.goals.lipids?.polyUnsaturated.goal || Math.round(lipidGoal * 0.34);
   const omega3Goal = activeProfile.goals.lipids?.omega3.goal || 2;
-  const omega6Goal = activeProfile.goals.lipids?.omega6.goal || 10;
+  const omega6Goal = activeProfile.goals.lipids?.omega6.goal || polyUnsaturatedGoal - 2;
 
   return (
     <div className="space-y-6">
@@ -104,6 +104,10 @@ export const MacronutrientTab: React.FC<MacronutrientTabProps> = ({
               indent={false}
             />
             
+            <div className="text-xs text-gray-500">
+              Les lipides totaux sont calculés comme la somme des composants ci-dessous
+            </div>
+            
             <NutrientProgress
               label="Acides gras saturés"
               current={saturatedFats}
@@ -130,6 +134,10 @@ export const MacronutrientTab: React.FC<MacronutrientTabProps> = ({
               color="bg-nutri-yellow"
               indent={true}
             />
+            
+            <div className="text-xs text-gray-500 ml-6">
+              Les poly-insaturés sont calculés comme la somme des oméga-3 et oméga-6
+            </div>
             
             <div className="ml-6">
               <NutrientProgress
