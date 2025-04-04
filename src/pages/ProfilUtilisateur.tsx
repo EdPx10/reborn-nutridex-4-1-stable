@@ -20,12 +20,12 @@ const ProfilUtilisateur: React.FC = () => {
   useEffect(() => {
     checkAndResetIfNewDay();
   }, [checkAndResetIfNewDay]);
-  
-  // Synchroniser les apports nutritionnels avec le profil utilisateur
-  useEffect(() => {
-    if (!activeProfile) return;
 
-    const totalNutrients = calculateTotalNutrients(items);
+  // Synchroniser les apports nutritionnels avec le profil utilisateur
+useEffect(() => {
+  if (!activeProfile || items.length === 0) return;
+
+  const totalNutrients = calculateTotalNutrients(items);
 
     updateNutrientIntake({
       glucides: totalNutrients.glucides || 0,
