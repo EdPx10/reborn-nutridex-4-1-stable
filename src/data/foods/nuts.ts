@@ -12,7 +12,7 @@ export const nuts: Food[] = [
       lipides: 49.9,
       fibres: 12.2,
       vitamines: {
-        e: 25.6
+        vitamineE: 25.6
       },
       mineraux: {
         magnesium: 270

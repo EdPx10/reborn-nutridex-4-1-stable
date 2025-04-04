@@ -11,10 +11,10 @@ export const proteins: Food[] = [
       proteines: 20,
       lipides: 13,
       vitamines: {
-        d: 11,
-        b12: 2.8
+        vitamineD: 11,
+        vitamineB12: 2.8
       },
-      mineraux: {
+      oligoelements: {
         selenium: 31.5
       }
     },

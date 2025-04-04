@@ -13,11 +13,13 @@ export const vegetables: Food[] = [
       lipides: 0.4,
       fibres: 2.2,
       vitamines: {
-        a: 469,
-        k: 483
+        vitamineA: 469,
+        vitamineK1: 483
+      },
+      oligoelements: {
+        fer: 2.7
       },
       mineraux: {
-        fer: 2.7,
         magnesium: 79
       }
     },
@@ -38,8 +40,8 @@ export const vegetables: Food[] = [
       lipides: 0.4,
       fibres: 2.6,
       vitamines: {
-        c: 89.2,
-        k: 102
+        vitamineC: 89.2,
+        vitamineK1: 102
       },
       mineraux: {
         potassium: 316

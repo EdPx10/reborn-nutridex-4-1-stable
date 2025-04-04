@@ -13,10 +13,10 @@ export const fruits: Food[] = [
       lipides: 0.3,
       fibres: 2.4,
       vitamines: {
-        c: 9.7,
-        k: 19.3
+        vitamineC: 9.7,
+        vitamineK1: 19.3
       },
-      mineraux: {
+      oligoelements: {
         manganese: 0.3
       }
     },
@@ -38,8 +38,8 @@ export const fruits: Food[] = [
       lipides: 15,
       fibres: 6.7,
       vitamines: {
-        e: 2.1,
-        k: 21
+        vitamineE: 2.1,
+        vitamineK1: 21
       },
       mineraux: {
         potassium: 485
@@ -63,9 +63,9 @@ export const fruits: Food[] = [
       lipides: 0.3,
       fibres: 2,
       vitamines: {
-        c: 58.8
+        vitamineC: 58.8
       },
-      mineraux: {
+      oligoelements: {
         manganese: 0.4
       }
     },

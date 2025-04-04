@@ -12,7 +12,9 @@ export const grains: Food[] = [
       lipides: 6,
       fibres: 7,
       mineraux: {
-        magnesium: 197,
+        magnesium: 197
+      },
+      oligoelements: {
         fer: 4.6
       }
     },
