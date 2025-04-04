@@ -6,6 +6,7 @@ import { useDailyPlateStore } from '@/store/dailyPlateStore';
 import { toast } from '@/hooks/use-toast';
 import { Plus, Check } from 'lucide-react';
 import AddToDailyPlateDialog from '@/components/ui/AddToDailyPlateDialog';
+import FoodImage from '@/components/ui/FoodImage';
 
 interface FoodHeaderProps {
   food: Food;
@@ -32,17 +33,13 @@ export const FoodHeader: React.FC<FoodHeaderProps> = ({ food }) => {
   return (
     <>
       <div className="relative">
-        {food.image ? (
-          <img 
-            src={food.image} 
-            alt={food.name} 
-            className="w-full h-64 object-cover"
-          />
-        ) : (
-          <div className="w-full h-64 bg-gray-200 flex items-center justify-center">
-            <span className="text-gray-400">{food.name}</span>
-          </div>
-        )}
+        <FoodImage 
+          src={food.image} 
+          alt={food.name} 
+          category={food.category}
+          size="lg"
+        />
+        
         <div className="absolute top-4 left-4">
           <span className={`px-3 py-1 rounded-full ${categoryInfo?.color || 'bg-gray-200'}`}>
             {categoryInfo?.name || food.category}

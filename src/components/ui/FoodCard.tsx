@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import AddToDailyPlateDialog from './AddToDailyPlateDialog';
 import { useDailyPlateStore } from '@/store/dailyPlateStore';
 import { toast } from '@/hooks/use-toast';
+import FoodImage from './FoodImage';
 
 interface FoodCardProps {
   food: Food;
@@ -57,22 +58,19 @@ export const FoodCard: React.FC<FoodCardProps> = ({ food }) => {
       <Link to={`/aliment/${id}`} className="block">
         <div className="rounded-2xl overflow-hidden bg-white food-card-shadow hover:shadow-md transition-shadow">
           <div className="relative">
-            {image ? (
-              <img 
-                src={image} 
-                alt={name} 
-                className="w-full h-40 object-cover"
-              />
-            ) : (
-              <div className="w-full h-40 bg-gray-200 flex items-center justify-center">
-                <span className="text-gray-400">{name}</span>
-              </div>
-            )}
+            <FoodImage 
+              src={image} 
+              alt={name} 
+              category={category}
+              size="md"
+            />
+            
             <div className="absolute top-2 left-2">
               <span className={`text-xs font-medium px-2 py-1 rounded-full ${categoryInfo?.color || 'bg-gray-200'}`}>
                 {categoryInfo?.name || category}
               </span>
             </div>
+            
             {foodSeasons && foodSeasons.length > 0 && (
               <div className="absolute top-2 right-2 bg-white rounded-full p-1.5 shadow-sm flex gap-1">
                 {foodSeasons.map((season, index) => (
@@ -82,6 +80,7 @@ export const FoodCard: React.FC<FoodCardProps> = ({ food }) => {
                 ))}
               </div>
             )}
+            
             <button 
               onClick={handleButtonClick}
               className={`absolute bottom-2 right-2 w-8 h-8 rounded-full flex items-center justify-center shadow-md

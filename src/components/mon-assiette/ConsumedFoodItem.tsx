@@ -6,6 +6,7 @@ import { foodCategories } from '@/data/healthBenefits';
 import { PlateItem } from '@/store/dailyPlateStore';
 import AddToDailyPlateDialog from '@/components/ui/AddToDailyPlateDialog';
 import { Link } from 'react-router-dom';
+import FoodImage from '@/components/ui/FoodImage';
 
 interface ConsumedFoodItemProps {
   item: PlateItem;
@@ -41,17 +42,12 @@ export const ConsumedFoodItem: React.FC<ConsumedFoodItemProps> = ({ item, onRemo
         to={`/aliment/${food.id}`} 
         className="flex-shrink-0"
       >
-        {food.image ? (
-          <img 
-            src={food.image} 
-            alt={food.name} 
-            className="w-16 h-16 rounded-md object-cover"
-          />
-        ) : (
-          <div className={`w-16 h-16 rounded-md flex items-center justify-center ${categoryInfo?.color || 'bg-gray-100'}`}>
-            {food.name.charAt(0)}
-          </div>
-        )}
+        <FoodImage 
+          src={food.image} 
+          alt={food.name} 
+          category={food.category}
+          size="sm"
+        />
       </Link>
       
       <div className="flex-grow">
@@ -127,4 +123,3 @@ export const ConsumedFoodItem: React.FC<ConsumedFoodItemProps> = ({ item, onRemo
 };
 
 export default ConsumedFoodItem;
-
