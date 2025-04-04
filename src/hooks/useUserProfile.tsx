@@ -176,141 +176,63 @@ export const useUserProfile = () => {
     };
   };
 
-const updateNutrientIntake = (nutrients) => {
-  const empty = getEmptyNutrientIntake();
+  const updateNutrientIntake = (nutrients) => {
+    const empty = getEmptyNutrientIntake();
 
-  const merged = {
-    ...empty,
-    ...nutrients,
-    lipids: {
-      ...empty.lipids,
-      ...nutrients.lipids,
-    },
-    vitamines: {
-      ...empty.vitamines,
-      ...nutrients.vitamines,
-    },
-    mineraux: {
-      ...empty.mineraux,
-      ...nutrients.mineraux,
-    },
-    oligoelements: {
-      ...empty.oligoelements,
-      ...nutrients.oligoelements,
-    },
-  };
-
-  const updatedProfile = { ...activeProfile };
-
-  updatedProfile.goals.glucides.current = merged.glucides;
-  updatedProfile.goals.proteines.current = merged.proteines;
-  updatedProfile.goals.lipides.current = merged.lipides;
-  updatedProfile.goals.fibres.current = merged.fibres;
-
-  if (updatedProfile.goals.lipids) {
-    updatedProfile.goals.lipids.saturated.current = merged.lipids.saturated;
-    updatedProfile.goals.lipids.monoUnsaturated.current = merged.lipids.monoUnsaturated;
-    updatedProfile.goals.lipids.polyUnsaturated.current = merged.lipids.omega3 + merged.lipids.omega6;
-    updatedProfile.goals.lipids.omega3.current = merged.lipids.omega3;
-    updatedProfile.goals.lipids.omega6.current = merged.lipids.omega6;
-  }
-
-  for (const key in merged.vitamines) {
-    if (updatedProfile.goals.vitamines[key]) {
-      updatedProfile.goals.vitamines[key].current = merged.vitamines[key];
-    }
-  }
-
-  for (const key in merged.mineraux) {
-    if (updatedProfile.goals.mineraux[key]) {
-      updatedProfile.goals.mineraux[key].current = merged.mineraux[key];
-    }
-  }
-
-  for (const key in merged.oligoelements) {
-    if (updatedProfile.goals.oligoelements[key]) {
-      updatedProfile.goals.oligoelements[key].current = merged.oligoelements[key];
-    }
-  }
-
-  updateProfile(updatedProfile);
-};
+    const merged = {
+      ...empty,
+      ...nutrients,
+      lipids: {
+        ...empty.lipids,
+        ...nutrients.lipids,
+      },
+      vitamines: {
+        ...empty.vitamines,
+        ...nutrients.vitamines,
+      },
+      mineraux: {
+        ...empty.mineraux,
+        ...nutrients.mineraux,
+      },
+      oligoelements: {
+        ...empty.oligoelements,
+        ...nutrients.oligoelements,
+      },
+    };
 
     const updatedProfile = { ...activeProfile };
-    
-    // Reset all nutrient values to 0
-    updatedProfile.goals.glucides.current = 0;
-    updatedProfile.goals.proteines.current = 0;
-    updatedProfile.goals.lipides.current = 0;
-    updatedProfile.goals.fibres.current = 0;
-    
+
+    updatedProfile.goals.glucides.current = merged.glucides;
+    updatedProfile.goals.proteines.current = merged.proteines;
+    updatedProfile.goals.lipides.current = merged.lipides;
+    updatedProfile.goals.fibres.current = merged.fibres;
+
     if (updatedProfile.goals.lipids) {
-      updatedProfile.goals.lipids.saturated.current = 0;
-      updatedProfile.goals.lipids.monoUnsaturated.current = 0;
-      updatedProfile.goals.lipids.polyUnsaturated.current = 0;
-      updatedProfile.goals.lipids.omega3.current = 0;
-      updatedProfile.goals.lipids.omega6.current = 0;
+      updatedProfile.goals.lipids.saturated.current = merged.lipids.saturated;
+      updatedProfile.goals.lipids.monoUnsaturated.current = merged.lipids.monoUnsaturated;
+      updatedProfile.goals.lipids.polyUnsaturated.current = merged.lipids.omega3 + merged.lipids.omega6;
+      updatedProfile.goals.lipids.omega3.current = merged.lipids.omega3;
+      updatedProfile.goals.lipids.omega6.current = merged.lipids.omega6;
     }
-    
-    Object.keys(updatedProfile.goals.vitamines).forEach(key => {
-      updatedProfile.goals.vitamines[key].current = 0;
-    });
-    
-    Object.keys(updatedProfile.goals.mineraux).forEach(key => {
-      updatedProfile.goals.mineraux[key].current = 0;
-    });
-    
-    Object.keys(updatedProfile.goals.oligoelements).forEach(key => {
-      updatedProfile.goals.oligoelements[key].current = 0;
-    });
-    
-    // Update with the provided nutrient values
-    if (nutrients.lipids) {
-      updatedProfile.goals.lipids.saturated.current = nutrients.lipids.saturated;
-      updatedProfile.goals.lipids.monoUnsaturated.current = nutrients.lipids.monoUnsaturated;
-      updatedProfile.goals.lipids.polyUnsaturated.current = nutrients.lipids.omega3 + nutrients.lipids.omega6;
-      updatedProfile.goals.lipids.omega3.current = nutrients.lipids.omega3;
-      updatedProfile.goals.lipids.omega6.current = nutrients.lipids.omega6;
-      
-      updatedProfile.goals.lipides.current = 
-        nutrients.lipids.saturated + 
-        nutrients.lipids.monoUnsaturated + 
-        (nutrients.lipids.omega3 + nutrients.lipids.omega6);
-    } else {
-      updatedProfile.goals.lipides.current = nutrients.lipides;
-      
-      const totalLipids = nutrients.lipides;
-      if (updatedProfile.goals.lipids) {
-        updatedProfile.goals.lipids.saturated.current = totalLipids * 0.33;
-        updatedProfile.goals.lipids.monoUnsaturated.current = totalLipids * 0.33;
-        updatedProfile.goals.lipids.polyUnsaturated.current = totalLipids * 0.34;
-        updatedProfile.goals.lipids.omega3.current = totalLipids * 0.05;
-        updatedProfile.goals.lipids.omega6.current = totalLipids * 0.29;
-      }
-    }
-    
-    updatedProfile.goals.glucides.current = nutrients.glucides;
-    updatedProfile.goals.proteines.current = nutrients.proteines;
-    updatedProfile.goals.fibres.current = nutrients.fibres;
-    
-    Object.keys(nutrients.vitamines).forEach(key => {
+
+    for (const key in merged.vitamines) {
       if (updatedProfile.goals.vitamines[key]) {
-        updatedProfile.goals.vitamines[key].current = nutrients.vitamines[key];
+        updatedProfile.goals.vitamines[key].current = merged.vitamines[key];
       }
-    });
-    
-    Object.keys(nutrients.mineraux).forEach(key => {
+    }
+
+    for (const key in merged.mineraux) {
       if (updatedProfile.goals.mineraux[key]) {
-        updatedProfile.goals.mineraux[key].current = nutrients.mineraux[key];
+        updatedProfile.goals.mineraux[key].current = merged.mineraux[key];
       }
-    });
-    
-    Object.keys(nutrients.oligoelements).forEach(key => {
+    }
+
+    for (const key in merged.oligoelements) {
       if (updatedProfile.goals.oligoelements[key]) {
-        updatedProfile.goals.oligoelements[key].current = nutrients.oligoelements[key];
+        updatedProfile.goals.oligoelements[key].current = merged.oligoelements[key];
       }
-    });
-    
+    }
+
     updateProfile(updatedProfile);
   };
 
