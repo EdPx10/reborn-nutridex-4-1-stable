@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { UserProfile } from '@/types';
 
@@ -51,7 +52,7 @@ export const useUserProfile = () => {
         const parsedProfiles = JSON.parse(savedProfiles);
         const updatedProfiles = parsedProfiles.map((profile: UserProfile) => {
           if (!profile.goals.lipids) {
-            const totalLipids = profile.goals.lipids.goal;
+            const totalLipids = profile.goals.lipides.goal;
             profile.goals.lipids = {
               saturated: { current: 0, goal: Math.round(totalLipids * 0.33), unit: 'g' },
               monoUnsaturated: { current: 0, goal: Math.round(totalLipids * 0.33), unit: 'g' },
@@ -65,7 +66,7 @@ export const useUserProfile = () => {
           const omega6Goal = profile.goals.lipids.omega6.goal;
           profile.goals.lipids.polyUnsaturated.goal = omega3Goal + omega6Goal;
           
-          profile.goals.lipids.goal = 
+          profile.goals.lipides.goal = 
             profile.goals.lipids.saturated.goal + 
             profile.goals.lipids.monoUnsaturated.goal + 
             profile.goals.lipids.polyUnsaturated.goal;
@@ -101,7 +102,7 @@ export const useUserProfile = () => {
         updatedProfile.goals.lipids.omega3.goal + 
         updatedProfile.goals.lipids.omega6.goal;
       
-      updatedProfile.goals.lipids.goal = 
+      updatedProfile.goals.lipides.goal = 
         updatedProfile.goals.lipids.saturated.goal + 
         updatedProfile.goals.lipids.monoUnsaturated.goal + 
         updatedProfile.goals.lipids.polyUnsaturated.goal;
@@ -199,6 +200,7 @@ export const useUserProfile = () => {
   }) => {
     const updatedProfile = { ...activeProfile };
     
+    // Reset all nutrient values to 0
     updatedProfile.goals.glucides.current = 0;
     updatedProfile.goals.proteines.current = 0;
     updatedProfile.goals.lipides.current = 0;
@@ -224,43 +226,29 @@ export const useUserProfile = () => {
       updatedProfile.goals.oligoelements[key].current = 0;
     });
     
+    // Update with the provided nutrient values
     if (nutrients.lipids) {
-      updatedProfile.goals.lipids = {
-        saturated: { 
-          ...updatedProfile.goals.lipids!.saturated, 
-          current: nutrients.lipids.saturated 
-        },
-        monoUnsaturated: { 
-          ...updatedProfile.goals.lipids!.monoUnsaturated, 
-          current: nutrients.lipids.monoUnsaturated 
-        },
-        polyUnsaturated: { 
-          ...updatedProfile.goals.lipids!.polyUnsaturated, 
-          current: nutrients.lipids.omega3 + nutrients.lipids.omega6 
-        },
-        omega3: { 
-          ...updatedProfile.goals.lipids!.omega3, 
-          current: nutrients.lipids.omega3 
-        },
-        omega6: { 
-          ...updatedProfile.goals.lipids!.omega6, 
-          current: nutrients.lipids.omega6 
-        },
-      };
+      updatedProfile.goals.lipids.saturated.current = nutrients.lipids.saturated;
+      updatedProfile.goals.lipids.monoUnsaturated.current = nutrients.lipids.monoUnsaturated;
+      updatedProfile.goals.lipids.polyUnsaturated.current = nutrients.lipids.omega3 + nutrients.lipids.omega6;
+      updatedProfile.goals.lipids.omega3.current = nutrients.lipids.omega3;
+      updatedProfile.goals.lipids.omega6.current = nutrients.lipids.omega6;
       
-      updatedProfile.goals.lipids.current = 
+      updatedProfile.goals.lipides.current = 
         nutrients.lipids.saturated + 
         nutrients.lipids.monoUnsaturated + 
         (nutrients.lipids.omega3 + nutrients.lipids.omega6);
     } else {
-      updatedProfile.goals.lipids.current = nutrients.lipides;
+      updatedProfile.goals.lipides.current = nutrients.lipides;
       
       const totalLipids = nutrients.lipides;
-      updatedProfile.goals.lipids!.saturated.current = totalLipids * 0.33;
-      updatedProfile.goals.lipids!.monoUnsaturated.current = totalLipids * 0.33;
-      updatedProfile.goals.lipids!.polyUnsaturated.current = totalLipids * 0.34;
-      updatedProfile.goals.lipids!.omega3.current = totalLipids * 0.05;
-      updatedProfile.goals.lipids!.omega6.current = totalLipids * 0.29;
+      if (updatedProfile.goals.lipids) {
+        updatedProfile.goals.lipids.saturated.current = totalLipids * 0.33;
+        updatedProfile.goals.lipids.monoUnsaturated.current = totalLipids * 0.33;
+        updatedProfile.goals.lipids.polyUnsaturated.current = totalLipids * 0.34;
+        updatedProfile.goals.lipids.omega3.current = totalLipids * 0.05;
+        updatedProfile.goals.lipids.omega6.current = totalLipids * 0.29;
+      }
     }
     
     updatedProfile.goals.glucides.current = nutrients.glucides;
@@ -301,6 +289,7 @@ export const useUserProfile = () => {
     setActiveProfile,
     setActiveProfileById,
     updateNutrientIntake,
+    getEmptyNutrientIntake,
   };
 };
 
