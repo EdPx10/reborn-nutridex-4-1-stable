@@ -13,11 +13,11 @@ const DEFAULT_PROFILE: UserProfile = {
     proteines: { current: 0, goal: 55, unit: 'g' },
     lipides: { current: 0, goal: 78, unit: 'g' },
     lipids: {
-      saturated: { current: 0, goal: 26, unit: 'g' }, // ~1/3 des lipides totaux
-      monoUnsaturated: { current: 0, goal: 26, unit: 'g' }, // ~1/3 des lipides totaux
-      polyUnsaturated: { current: 0, goal: 26, unit: 'g' }, // ~1/3 des lipides totaux
-      omega3: { current: 0, goal: 2, unit: 'g' }, // Recommandation AHA
-      omega6: { current: 0, goal: 24, unit: 'g' } // Restant des poly-insaturés
+      saturated: { current: 0, goal: 26, unit: 'g' },
+      monoUnsaturated: { current: 0, goal: 26, unit: 'g' },
+      polyUnsaturated: { current: 0, goal: 26, unit: 'g' },
+      omega3: { current: 0, goal: 2, unit: 'g' },
+      omega6: { current: 0, goal: 24, unit: 'g' }
     },
     fibres: { current: 0, goal: 30, unit: 'g' },
     vitamines: {
@@ -42,7 +42,6 @@ export const useUserProfile = () => {
   const [profiles, setProfiles] = useState<UserProfile[]>([DEFAULT_PROFILE]);
   const [activeProfileId, setActiveProfileId] = useState<string>(DEFAULT_PROFILE.id);
 
-  // Load profiles from localStorage on initial render
   useEffect(() => {
     const savedProfiles = localStorage.getItem('userProfiles');
     const savedActiveProfileId = localStorage.getItem('activeProfileId');
@@ -50,11 +49,9 @@ export const useUserProfile = () => {
     if (savedProfiles) {
       try {
         const parsedProfiles = JSON.parse(savedProfiles);
-        // Assurer la rétrocompatibilité avec les profils sans objectifs détaillés de lipides
         const updatedProfiles = parsedProfiles.map((profile: UserProfile) => {
           if (!profile.goals.lipids) {
-            // Calculer les valeurs par défaut basées sur les lipides totaux
-            const totalLipids = profile.goals.lipides.goal;
+            const totalLipids = profile.goals.lipids.goal;
             profile.goals.lipids = {
               saturated: { current: 0, goal: Math.round(totalLipids * 0.33), unit: 'g' },
               monoUnsaturated: { current: 0, goal: Math.round(totalLipids * 0.33), unit: 'g' },
@@ -64,12 +61,11 @@ export const useUserProfile = () => {
             };
           }
           
-          // S'assurer que les valeurs sont cohérentes
           const omega3Goal = profile.goals.lipids.omega3.goal;
           const omega6Goal = profile.goals.lipids.omega6.goal;
           profile.goals.lipids.polyUnsaturated.goal = omega3Goal + omega6Goal;
           
-          profile.goals.lipides.goal = 
+          profile.goals.lipids.goal = 
             profile.goals.lipids.saturated.goal + 
             profile.goals.lipids.monoUnsaturated.goal + 
             profile.goals.lipids.polyUnsaturated.goal;
@@ -88,7 +84,6 @@ export const useUserProfile = () => {
     }
   }, []);
 
-  // Save profiles to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem('userProfiles', JSON.stringify(profiles));
     localStorage.setItem('activeProfileId', activeProfileId);
@@ -98,19 +93,15 @@ export const useUserProfile = () => {
     return profiles.find(profile => profile.id === activeProfileId) || DEFAULT_PROFILE;
   };
 
-  // Added getter for active profile to match usage in components
   const activeProfile = getActiveProfile();
 
   const updateProfile = (updatedProfile: UserProfile) => {
-    // S'assurer que les valeurs de lipides sont cohérentes
     if (updatedProfile.goals.lipids) {
-      // Calculer les AGP comme Oméga-3 + Oméga-6
       updatedProfile.goals.lipids.polyUnsaturated.goal = 
         updatedProfile.goals.lipids.omega3.goal + 
         updatedProfile.goals.lipids.omega6.goal;
       
-      // Calculer les lipides totaux comme somme des composants
-      updatedProfile.goals.lipides.goal = 
+      updatedProfile.goals.lipids.goal = 
         updatedProfile.goals.lipids.saturated.goal + 
         updatedProfile.goals.lipids.monoUnsaturated.goal + 
         updatedProfile.goals.lipids.polyUnsaturated.goal;
@@ -153,7 +144,37 @@ export const useUserProfile = () => {
     return false;
   };
 
-  // Fix the updateNutrientIntake function to correctly handle the lipides vs lipids naming
+  const getEmptyNutrientIntake = () => {
+    return {
+      glucides: 0,
+      proteines: 0,
+      lipides: 0,
+      fibres: 0,
+      lipids: {
+        saturated: 0,
+        monoUnsaturated: 0,
+        polyUnsaturated: 0,
+        omega3: 0,
+        omega6: 0
+      },
+      vitamines: {
+        c: 0,
+        d: 0,
+        b12: 0,
+        a: 0,
+      },
+      mineraux: {
+        calcium: 0,
+        fer: 0,
+        magnesium: 0,
+      },
+      oligoelements: {
+        zinc: 0,
+        selenium: 0,
+      }
+    };
+  };
+
   const updateNutrientIntake = (nutrients: {
     glucides: number;
     proteines: number;
@@ -178,9 +199,32 @@ export const useUserProfile = () => {
   }) => {
     const updatedProfile = { ...activeProfile };
     
-    // Mettre à jour les lipides détaillés en priorité s'ils sont disponibles
+    updatedProfile.goals.glucides.current = 0;
+    updatedProfile.goals.proteines.current = 0;
+    updatedProfile.goals.lipides.current = 0;
+    updatedProfile.goals.fibres.current = 0;
+    
+    if (updatedProfile.goals.lipids) {
+      updatedProfile.goals.lipids.saturated.current = 0;
+      updatedProfile.goals.lipids.monoUnsaturated.current = 0;
+      updatedProfile.goals.lipids.polyUnsaturated.current = 0;
+      updatedProfile.goals.lipids.omega3.current = 0;
+      updatedProfile.goals.lipids.omega6.current = 0;
+    }
+    
+    Object.keys(updatedProfile.goals.vitamines).forEach(key => {
+      updatedProfile.goals.vitamines[key].current = 0;
+    });
+    
+    Object.keys(updatedProfile.goals.mineraux).forEach(key => {
+      updatedProfile.goals.mineraux[key].current = 0;
+    });
+    
+    Object.keys(updatedProfile.goals.oligoelements).forEach(key => {
+      updatedProfile.goals.oligoelements[key].current = 0;
+    });
+    
     if (nutrients.lipids) {
-      // Mettre à jour les valeurs d'acides gras individuels
       updatedProfile.goals.lipids = {
         saturated: { 
           ...updatedProfile.goals.lipids!.saturated, 
@@ -204,16 +248,13 @@ export const useUserProfile = () => {
         },
       };
       
-      // Calculer les lipides totaux comme somme des composants
-      updatedProfile.goals.lipides.current = 
+      updatedProfile.goals.lipids.current = 
         nutrients.lipids.saturated + 
         nutrients.lipids.monoUnsaturated + 
         (nutrients.lipids.omega3 + nutrients.lipids.omega6);
     } else {
-      // Fallback si les lipides détaillés ne sont pas fournis
-      updatedProfile.goals.lipides.current = nutrients.lipides;
+      updatedProfile.goals.lipids.current = nutrients.lipides;
       
-      // Répartir approximativement les lipides totaux entre les différents types
       const totalLipids = nutrients.lipides;
       updatedProfile.goals.lipids!.saturated.current = totalLipids * 0.33;
       updatedProfile.goals.lipids!.monoUnsaturated.current = totalLipids * 0.33;
@@ -222,12 +263,10 @@ export const useUserProfile = () => {
       updatedProfile.goals.lipids!.omega6.current = totalLipids * 0.29;
     }
     
-    // Update remaining macronutrient values
     updatedProfile.goals.glucides.current = nutrients.glucides;
     updatedProfile.goals.proteines.current = nutrients.proteines;
     updatedProfile.goals.fibres.current = nutrients.fibres;
     
-    // Update micronutrient values
     Object.keys(nutrients.vitamines).forEach(key => {
       if (updatedProfile.goals.vitamines[key]) {
         updatedProfile.goals.vitamines[key].current = nutrients.vitamines[key];
@@ -249,7 +288,6 @@ export const useUserProfile = () => {
     updateProfile(updatedProfile);
   };
 
-  // Added alias for setActiveProfile to match usage in ProfilUtilisateur.tsx
   const setActiveProfileById = setActiveProfile;
 
   return {
