@@ -176,28 +176,66 @@ export const useUserProfile = () => {
     };
   };
 
-  const updateNutrientIntake = (nutrients: {
-    glucides: number;
-    proteines: number;
-    lipides: number;
-    fibres: number;
-    lipids?: {
-      saturated: number;
-      monoUnsaturated: number;
-      polyUnsaturated: number;
-      omega3: number;
-      omega6: number;
-    };
+const updateNutrientIntake = (nutrients) => {
+  const empty = getEmptyNutrientIntake();
+
+  const merged = {
+    ...empty,
+    ...nutrients,
+    lipids: {
+      ...empty.lipids,
+      ...nutrients.lipids,
+    },
     vitamines: {
-      [key: string]: number;
-    };
+      ...empty.vitamines,
+      ...nutrients.vitamines,
+    },
     mineraux: {
-      [key: string]: number;
-    };
+      ...empty.mineraux,
+      ...nutrients.mineraux,
+    },
     oligoelements: {
-      [key: string]: number;
-    };
-  }) => {
+      ...empty.oligoelements,
+      ...nutrients.oligoelements,
+    },
+  };
+
+  const updatedProfile = { ...activeProfile };
+
+  updatedProfile.goals.glucides.current = merged.glucides;
+  updatedProfile.goals.proteines.current = merged.proteines;
+  updatedProfile.goals.lipides.current = merged.lipides;
+  updatedProfile.goals.fibres.current = merged.fibres;
+
+  if (updatedProfile.goals.lipids) {
+    updatedProfile.goals.lipids.saturated.current = merged.lipids.saturated;
+    updatedProfile.goals.lipids.monoUnsaturated.current = merged.lipids.monoUnsaturated;
+    updatedProfile.goals.lipids.polyUnsaturated.current = merged.lipids.omega3 + merged.lipids.omega6;
+    updatedProfile.goals.lipids.omega3.current = merged.lipids.omega3;
+    updatedProfile.goals.lipids.omega6.current = merged.lipids.omega6;
+  }
+
+  for (const key in merged.vitamines) {
+    if (updatedProfile.goals.vitamines[key]) {
+      updatedProfile.goals.vitamines[key].current = merged.vitamines[key];
+    }
+  }
+
+  for (const key in merged.mineraux) {
+    if (updatedProfile.goals.mineraux[key]) {
+      updatedProfile.goals.mineraux[key].current = merged.mineraux[key];
+    }
+  }
+
+  for (const key in merged.oligoelements) {
+    if (updatedProfile.goals.oligoelements[key]) {
+      updatedProfile.goals.oligoelements[key].current = merged.oligoelements[key];
+    }
+  }
+
+  updateProfile(updatedProfile);
+};
+
     const updatedProfile = { ...activeProfile };
     
     // Reset all nutrient values to 0
