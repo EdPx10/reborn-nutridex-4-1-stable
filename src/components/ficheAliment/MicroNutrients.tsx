@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Food } from '@/types';
-import NutrientItem from './NutrientItem';
 import NutrientSection from './NutrientSection';
 
 interface MicroNutrientsProps {
@@ -9,14 +8,21 @@ interface MicroNutrientsProps {
 }
 
 export const MicroNutrients: React.FC<MicroNutrientsProps> = ({ food }) => {
-  // Format labels for vitamins and minerals
-  const formatVitaminLabel = (key: string) => `Vit ${key.toUpperCase()}`;
-  const formatMineralLabel = (key: string) => key.charAt(0).toUpperCase() + key.slice(1);
-  const formatOligoLabel = (key: string) => key.charAt(0).toUpperCase() + key.slice(1);
+  // Format labels for vitamins
+  const formatVitaminLabel = (key: string) => {
+    if (key.startsWith('vitamine')) {
+      const letter = key.replace('vitamine', '');
+      return `Vit. ${letter.toUpperCase()}`;
+    }
+    return key;
+  };
   
-  const hasVitamins = food.nutrients.vitamines && Object.keys(food.nutrients.vitamines).length > 0;
-  const hasMinerals = food.nutrients.mineraux && Object.keys(food.nutrients.mineraux).length > 0;
-  const hasOligoelements = food.nutrients.oligoelements && Object.keys(food.nutrients.oligoelements).length > 0;
+  // Format labels for minerals and oligo-elements
+  const formatNutrientLabel = (key: string) => key.charAt(0).toUpperCase() + key.slice(1);
+  
+  const hasVitamins = food.nutrients.vitamines && Object.values(food.nutrients.vitamines).some(val => val && val > 0);
+  const hasMinerals = food.nutrients.mineraux && Object.values(food.nutrients.mineraux).some(val => val && val > 0);
+  const hasOligoelements = food.nutrients.oligoelements && Object.values(food.nutrients.oligoelements).some(val => val && val > 0);
   
   if (!hasVitamins && !hasMinerals && !hasOligoelements) {
     return null;
@@ -28,7 +34,7 @@ export const MicroNutrients: React.FC<MicroNutrientsProps> = ({ food }) => {
         <NutrientSection
           title="Vitamines"
           nutrients={food.nutrients.vitamines || {}}
-          unit="mg"
+          unit="µg"
           labelFormatter={formatVitaminLabel}
           category="vitamines"
         />
@@ -39,7 +45,7 @@ export const MicroNutrients: React.FC<MicroNutrientsProps> = ({ food }) => {
           title="Minéraux"
           nutrients={food.nutrients.mineraux || {}}
           unit="mg"
-          labelFormatter={formatMineralLabel}
+          labelFormatter={formatNutrientLabel}
           category="mineraux"
         />
       )}
@@ -48,8 +54,8 @@ export const MicroNutrients: React.FC<MicroNutrientsProps> = ({ food }) => {
         <NutrientSection
           title="Oligo-éléments"
           nutrients={food.nutrients.oligoelements || {}}
-          unit="μg"
-          labelFormatter={formatOligoLabel}
+          unit="µg"
+          labelFormatter={formatNutrientLabel}
           category="oligoelements"
         />
       )}

@@ -4,7 +4,7 @@ import NutrientItem from './NutrientItem';
 
 interface NutrientSectionProps {
   title: string;
-  nutrients: Record<string, number>;
+  nutrients: Record<string, number | undefined>;
   unit?: string;
   labelFormatter?: (key: string) => string;
   category?: string;
@@ -21,7 +21,7 @@ export const NutrientSection: React.FC<NutrientSectionProps> = ({
     return null;
   }
 
-  // Filter out nutrients with value 0
+  // Filter out nutrients with value 0 or undefined
   const nonZeroNutrients = Object.entries(nutrients)
     .filter(([_, value]) => typeof value === 'number' && value > 0)
     .reduce<Record<string, number>>((acc, [key, value]) => {

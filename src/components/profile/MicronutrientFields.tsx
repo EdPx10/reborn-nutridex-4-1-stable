@@ -15,16 +15,22 @@ const MicronutrientFields: React.FC<MicronutrientFieldsProps> = ({ form, profile
       <div className="rounded-lg border p-4">
         <h3 className="font-medium mb-2">Vitamines</h3>
         
-        {Object.entries(profile.goals.vitamines).map(([key, value]) => (
-          renderNutrientField({
+        {Object.entries(profile.goals.vitamines).map(([key, value]) => {
+          let label = key;
+          if (key.startsWith('vitamine')) {
+            const letter = key.replace('vitamine', '');
+            label = `Vitamine ${letter.toUpperCase()}`;
+          }
+          
+          return renderNutrientField({
             category: 'vitamines',
             nutrientKey: key,
-            label: `Vitamine ${key.toUpperCase()}`,
+            label: label,
             unit: value.unit,
             path: `goals.vitamines.${key}.goal`,
             form
-          })
-        ))}
+          });
+        })}
       </div>
       
       <div className="rounded-lg border p-4">

@@ -8,6 +8,15 @@ interface MicroNutrientSectionProps {
   profile: UserProfile;
 }
 
+// Helper function to format vitamin names
+const formatVitaminName = (key: string): string => {
+  if (key.startsWith('vitamine')) {
+    const letter = key.replace('vitamine', '');
+    return `Vitamine ${letter.toUpperCase()}`;
+  }
+  return key.charAt(0).toUpperCase() + key.slice(1);
+};
+
 const MicroNutrientSection: React.FC<MicroNutrientSectionProps> = ({ profile }) => {
   return (
     <div className="space-y-4">
@@ -16,7 +25,7 @@ const MicroNutrientSection: React.FC<MicroNutrientSectionProps> = ({ profile }) 
           {Object.entries(profile.goals.vitamines).map(([key, goal]) => (
             <MicroNutrient
               key={key}
-              label={`Vitamine ${key.toUpperCase()}`}
+              label={formatVitaminName(key)}
               category="vitamines"
               nutrientKey={key}
               goal={goal}

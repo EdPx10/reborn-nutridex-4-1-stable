@@ -12,7 +12,10 @@ interface NutrientItemProps {
 
 // Helper function to format numbers to 1 decimal place if needed
 const formatValue = (value: number): string => {
-  return Number.isInteger(value) ? value.toString() : value.toFixed(1);
+  if (value === 0) return '0';
+  return value < 0.1 ? value.toFixed(2) : 
+         value < 10 ? value.toFixed(1) : 
+         Math.round(value).toString();
 };
 
 export const NutrientItem: React.FC<NutrientItemProps> = ({ 

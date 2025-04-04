@@ -17,13 +17,36 @@ export interface Food {
       omega6: number;
     };
     vitamines?: {
-      [key: string]: number;
+      vitamineA?: number;
+      vitamineD?: number;
+      vitamineE?: number;
+      vitamineK1?: number;
+      vitamineC?: number;
+      vitamineB1?: number;
+      vitamineB2?: number;
+      vitamineB3?: number;
+      vitamineB5?: number;
+      vitamineB6?: number;
+      vitamineB8?: number;
+      vitamineB9?: number;
+      vitamineB12?: number;
     };
     mineraux?: {
-      [key: string]: number;
+      calcium?: number;
+      magnesium?: number;
+      phosphore?: number;
+      potassium?: number;
+      sodium?: number;
     };
     oligoelements?: {
-      [key: string]: number;
+      fer?: number;
+      zinc?: number;
+      cuivre?: number;
+      manganese?: number;
+      selenium?: number;
+      iode?: number;
+      chrome?: number;
+      molybdene?: number;
     };
   };
   healthBenefits: HealthBenefit[];
@@ -72,17 +95,47 @@ export interface UserProfile {
     proteines: NutrientGoal;
     lipides: NutrientGoal;
     fibres: NutrientGoal;
+    lipids?: {
+      saturated: NutrientGoal;
+      monoUnsaturated: NutrientGoal;
+      polyUnsaturated: NutrientGoal;
+      omega3: NutrientGoal;
+      omega6: NutrientGoal;
+    };
     vitamines: {
-      [key: string]: NutrientGoal;
+      vitamineA: NutrientGoal;
+      vitamineD: NutrientGoal;
+      vitamineE: NutrientGoal;
+      vitamineK1: NutrientGoal;
+      vitamineC: NutrientGoal;
+      vitamineB1: NutrientGoal;
+      vitamineB2: NutrientGoal;
+      vitamineB3: NutrientGoal;
+      vitamineB5: NutrientGoal;
+      vitamineB6: NutrientGoal;
+      vitamineB8: NutrientGoal;
+      vitamineB9: NutrientGoal;
+      vitamineB12: NutrientGoal;
     };
     mineraux: {
-      [key: string]: NutrientGoal;
+      calcium: NutrientGoal;
+      magnesium: NutrientGoal;
+      phosphore: NutrientGoal;
+      potassium: NutrientGoal;
+      sodium: NutrientGoal;
     };
     oligoelements: {
-      [key: string]: NutrientGoal;
+      fer: NutrientGoal;
+      zinc: NutrientGoal;
+      cuivre: NutrientGoal;
+      manganese: NutrientGoal;
+      selenium: NutrientGoal;
+      iode: NutrientGoal;
+      chrome: NutrientGoal;
+      molybdene: NutrientGoal;
     };
   };
-  isActive: boolean;
+  isActive?: boolean;
 }
 
 export interface DailyConsumption {

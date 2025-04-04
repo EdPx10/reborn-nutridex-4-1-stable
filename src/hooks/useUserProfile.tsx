@@ -22,19 +22,36 @@ const DEFAULT_PROFILE: UserProfile = {
     },
     fibres: { current: 0, goal: 30, unit: 'g' },
     vitamines: {
-      c: { current: 0, goal: 90, unit: 'mg' },
-      d: { current: 0, goal: 20, unit: 'µg' },
-      b12: { current: 0, goal: 2.4, unit: 'µg' },
-      a: { current: 0, goal: 900, unit: 'µg' },
+      vitamineA: { current: 0, goal: 900, unit: 'µg' },
+      vitamineD: { current: 0, goal: 20, unit: 'µg' },
+      vitamineE: { current: 0, goal: 15, unit: 'mg' },
+      vitamineK1: { current: 0, goal: 120, unit: 'µg' },
+      vitamineC: { current: 0, goal: 90, unit: 'mg' },
+      vitamineB1: { current: 0, goal: 1.2, unit: 'mg' },
+      vitamineB2: { current: 0, goal: 1.3, unit: 'mg' },
+      vitamineB3: { current: 0, goal: 16, unit: 'mg' },
+      vitamineB5: { current: 0, goal: 5, unit: 'mg' },
+      vitamineB6: { current: 0, goal: 1.7, unit: 'mg' },
+      vitamineB8: { current: 0, goal: 30, unit: 'µg' },
+      vitamineB9: { current: 0, goal: 400, unit: 'µg' },
+      vitamineB12: { current: 0, goal: 2.4, unit: 'µg' },
     },
     mineraux: {
       calcium: { current: 0, goal: 1000, unit: 'mg' },
-      fer: { current: 0, goal: 8, unit: 'mg' },
       magnesium: { current: 0, goal: 420, unit: 'mg' },
+      phosphore: { current: 0, goal: 700, unit: 'mg' },
+      potassium: { current: 0, goal: 3500, unit: 'mg' },
+      sodium: { current: 0, goal: 2300, unit: 'mg' },
     },
     oligoelements: {
+      fer: { current: 0, goal: 8, unit: 'mg' },
       zinc: { current: 0, goal: 11, unit: 'mg' },
+      cuivre: { current: 0, goal: 900, unit: 'µg' },
+      manganese: { current: 0, goal: 2.3, unit: 'mg' },
       selenium: { current: 0, goal: 55, unit: 'µg' },
+      iode: { current: 0, goal: 150, unit: 'µg' },
+      chrome: { current: 0, goal: 35, unit: 'µg' },
+      molybdene: { current: 0, goal: 45, unit: 'µg' },
     }
   }
 };
@@ -60,6 +77,45 @@ export const useUserProfile = () => {
               omega3: { current: 0, goal: 2, unit: 'g' },
               omega6: { current: 0, goal: Math.round(totalLipids * 0.34) - 2, unit: 'g' }
             };
+          }
+          
+          // Ensure all vitamin fields exist
+          if (!profile.goals.vitamines) {
+            profile.goals.vitamines = DEFAULT_PROFILE.goals.vitamines;
+          } else {
+            // Add any missing vitamin fields
+            for (const key in DEFAULT_PROFILE.goals.vitamines) {
+              if (!profile.goals.vitamines[key as keyof typeof DEFAULT_PROFILE.goals.vitamines]) {
+                profile.goals.vitamines[key as keyof typeof DEFAULT_PROFILE.goals.vitamines] = 
+                  DEFAULT_PROFILE.goals.vitamines[key as keyof typeof DEFAULT_PROFILE.goals.vitamines];
+              }
+            }
+          }
+          
+          // Ensure all mineral fields exist
+          if (!profile.goals.mineraux) {
+            profile.goals.mineraux = DEFAULT_PROFILE.goals.mineraux;
+          } else {
+            // Add any missing mineral fields
+            for (const key in DEFAULT_PROFILE.goals.mineraux) {
+              if (!profile.goals.mineraux[key as keyof typeof DEFAULT_PROFILE.goals.mineraux]) {
+                profile.goals.mineraux[key as keyof typeof DEFAULT_PROFILE.goals.mineraux] = 
+                  DEFAULT_PROFILE.goals.mineraux[key as keyof typeof DEFAULT_PROFILE.goals.mineraux];
+              }
+            }
+          }
+          
+          // Ensure all oligoelement fields exist
+          if (!profile.goals.oligoelements) {
+            profile.goals.oligoelements = DEFAULT_PROFILE.goals.oligoelements;
+          } else {
+            // Add any missing oligoelement fields
+            for (const key in DEFAULT_PROFILE.goals.oligoelements) {
+              if (!profile.goals.oligoelements[key as keyof typeof DEFAULT_PROFILE.goals.oligoelements]) {
+                profile.goals.oligoelements[key as keyof typeof DEFAULT_PROFILE.goals.oligoelements] = 
+                  DEFAULT_PROFILE.goals.oligoelements[key as keyof typeof DEFAULT_PROFILE.goals.oligoelements];
+              }
+            }
           }
           
           const omega3Goal = profile.goals.lipids.omega3.goal;
@@ -159,26 +215,44 @@ export const useUserProfile = () => {
         omega6: 0
       },
       vitamines: {
-        c: 0,
-        d: 0,
-        b12: 0,
-        a: 0,
+        vitamineA: 0,
+        vitamineD: 0,
+        vitamineE: 0,
+        vitamineK1: 0,
+        vitamineC: 0,
+        vitamineB1: 0,
+        vitamineB2: 0,
+        vitamineB3: 0,
+        vitamineB5: 0,
+        vitamineB6: 0,
+        vitamineB8: 0,
+        vitamineB9: 0,
+        vitamineB12: 0
       },
       mineraux: {
         calcium: 0,
-        fer: 0,
         magnesium: 0,
+        phosphore: 0,
+        potassium: 0,
+        sodium: 0
       },
       oligoelements: {
+        fer: 0,
         zinc: 0,
+        cuivre: 0,
+        manganese: 0,
         selenium: 0,
+        iode: 0,
+        chrome: 0,
+        molybdene: 0
       }
     };
   };
 
-  const updateNutrientIntake = (nutrients) => {
+  const updateNutrientIntake = (nutrients: any) => {
     const empty = getEmptyNutrientIntake();
 
+    // Create a deep merged object with all fields
     const merged = {
       ...empty,
       ...nutrients,
@@ -202,11 +276,13 @@ export const useUserProfile = () => {
 
     const updatedProfile = { ...activeProfile };
 
+    // Update macro-nutrient values
     updatedProfile.goals.glucides.current = merged.glucides;
     updatedProfile.goals.proteines.current = merged.proteines;
     updatedProfile.goals.lipides.current = merged.lipides;
     updatedProfile.goals.fibres.current = merged.fibres;
 
+    // Update lipid details
     if (updatedProfile.goals.lipids) {
       updatedProfile.goals.lipids.saturated.current = merged.lipids.saturated;
       updatedProfile.goals.lipids.monoUnsaturated.current = merged.lipids.monoUnsaturated;
@@ -215,21 +291,27 @@ export const useUserProfile = () => {
       updatedProfile.goals.lipids.omega6.current = merged.lipids.omega6;
     }
 
+    // Update all vitamin values
     for (const key in merged.vitamines) {
-      if (updatedProfile.goals.vitamines[key]) {
-        updatedProfile.goals.vitamines[key].current = merged.vitamines[key];
+      if (updatedProfile.goals.vitamines[key as keyof typeof updatedProfile.goals.vitamines]) {
+        updatedProfile.goals.vitamines[key as keyof typeof updatedProfile.goals.vitamines].current = 
+          merged.vitamines[key as keyof typeof merged.vitamines];
       }
     }
 
+    // Update all mineral values
     for (const key in merged.mineraux) {
-      if (updatedProfile.goals.mineraux[key]) {
-        updatedProfile.goals.mineraux[key].current = merged.mineraux[key];
+      if (updatedProfile.goals.mineraux[key as keyof typeof updatedProfile.goals.mineraux]) {
+        updatedProfile.goals.mineraux[key as keyof typeof updatedProfile.goals.mineraux].current = 
+          merged.mineraux[key as keyof typeof merged.mineraux];
       }
     }
 
+    // Update all oligoelement values
     for (const key in merged.oligoelements) {
-      if (updatedProfile.goals.oligoelements[key]) {
-        updatedProfile.goals.oligoelements[key].current = merged.oligoelements[key];
+      if (updatedProfile.goals.oligoelements[key as keyof typeof updatedProfile.goals.oligoelements]) {
+        updatedProfile.goals.oligoelements[key as keyof typeof updatedProfile.goals.oligoelements].current = 
+          merged.oligoelements[key as keyof typeof merged.oligoelements];
       }
     }
 

@@ -1,28 +1,36 @@
 
 import React from 'react';
 import { ProgressBar } from '@/components/ui/ProgressBar';
+import { getNutrientIcon } from '@/components/ui/NutrientIcons';
 
 interface MicroNutrientProgressProps {
   label: string;
   current: number;
   goal: number;
   unit: string;
+  category?: 'vitamines' | 'mineraux' | 'oligoelements';
+  nutrientKey?: string;
 }
 
 export const MicroNutrientProgress: React.FC<MicroNutrientProgressProps> = ({ 
   label, 
   current, 
   goal, 
-  unit
+  unit,
+  category,
+  nutrientKey
 }) => {
   const percentage = Math.round((current / goal) * 100);
+  const iconElement = category && nutrientKey ? 
+    getNutrientIcon(category, nutrientKey, 16, "mr-1.5") : null;
   
   return (
-    <div>
+    <div className="flex-1">
       <div className="flex justify-between items-center mb-1">
-        <span>{label}</span>
+        {iconElement && <span className="mr-1">{iconElement}</span>}
+        <span className="flex-grow">{label}</span>
         <span className="text-sm text-gray-600">
-          {current.toFixed(2)} / {goal.toFixed(2)} {unit}
+          {current.toFixed(1)} / {goal.toFixed(1)} {unit}
         </span>
       </div>
       

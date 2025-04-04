@@ -8,8 +8,11 @@ import {
   CircleDot, 
   AtomIcon, 
   Sun, 
-  Banana, 
-  CircleDashed 
+  Citrus, 
+  CircleDashed, 
+  Flower, 
+  Milk, 
+  FlaskConical
 } from 'lucide-react';
 
 export const MacroIcons = {
@@ -34,39 +37,42 @@ export const MacroIcons = {
 export const MicroIcons = {
   // Vitamines
   vitamines: {
-    a: { icon: Sun, color: 'text-amber-500' }, // Vitamine liposoluble
-    d: { icon: Sun, color: 'text-amber-400' }, // Vitamine liposoluble
-    e: { icon: Sun, color: 'text-amber-300' }, // Vitamine liposoluble
-    k: { icon: Sun, color: 'text-amber-200' }, // Vitamine liposoluble
-    c: { icon: Banana, color: 'text-orange-400' }, // Vitamine hydrosoluble
-    b1: { icon: Pill, color: 'text-green-400' }, // Vitamine hydrosoluble
-    b2: { icon: Pill, color: 'text-green-500' }, // Vitamine hydrosoluble
-    b3: { icon: Pill, color: 'text-green-600' }, // Vitamine hydrosoluble
-    b5: { icon: Pill, color: 'text-green-700' }, // Vitamine hydrosoluble
-    b6: { icon: Pill, color: 'text-teal-400' }, // Vitamine hydrosoluble
-    b9: { icon: Pill, color: 'text-teal-500' }, // Vitamine hydrosoluble
-    b12: { icon: Pill, color: 'text-teal-600' }, // Vitamine hydrosoluble
+    vitamineA: { icon: Sun, color: 'text-amber-500' }, // Vitamine liposoluble
+    vitamineD: { icon: Sun, color: 'text-amber-400' }, // Vitamine liposoluble
+    vitamineE: { icon: Sun, color: 'text-amber-300' }, // Vitamine liposoluble
+    vitamineK1: { icon: Flower, color: 'text-green-800' }, // Vitamine liposoluble
+    vitamineC: { icon: Citrus, color: 'text-orange-400' }, // Vitamine hydrosoluble
+    vitamineB1: { icon: Pill, color: 'text-green-400' }, // Vitamine hydrosoluble
+    vitamineB2: { icon: Pill, color: 'text-green-500' }, // Vitamine hydrosoluble
+    vitamineB3: { icon: Pill, color: 'text-green-600' }, // Vitamine hydrosoluble
+    vitamineB5: { icon: Pill, color: 'text-green-700' }, // Vitamine hydrosoluble
+    vitamineB6: { icon: Pill, color: 'text-teal-400' }, // Vitamine hydrosoluble
+    vitamineB8: { icon: Pill, color: 'text-teal-300' }, // Vitamine hydrosoluble
+    vitamineB9: { icon: Pill, color: 'text-teal-500' }, // Vitamine hydrosoluble
+    vitamineB12: { icon: Pill, color: 'text-teal-600' }, // Vitamine hydrosoluble
     default: { icon: CircleDot, color: 'text-purple-500' }, // Pour les autres
   },
   
   // Minéraux
   mineraux: {
-    calcium: { icon: AtomIcon, color: 'text-blue-400' },
+    calcium: { icon: Milk, color: 'text-blue-400' },
     magnesium: { icon: AtomIcon, color: 'text-blue-500' },
+    phosphore: { icon: AtomIcon, color: 'text-indigo-400' },
     potassium: { icon: AtomIcon, color: 'text-blue-600' }, 
     sodium: { icon: AtomIcon, color: 'text-blue-700' },
-    fer: { icon: AtomIcon, color: 'text-red-400' },
-    zinc: { icon: AtomIcon, color: 'text-red-500' },
-    cuivre: { icon: AtomIcon, color: 'text-red-600' },
     default: { icon: CircleDashed, color: 'text-gray-500' },
   },
   
   // Oligo-éléments
   oligoelements: {
-    iode: { icon: CircleDashed, color: 'text-indigo-400' },
-    selenium: { icon: CircleDashed, color: 'text-indigo-500' },
-    manganese: { icon: CircleDashed, color: 'text-indigo-600' },
-    chrome: { icon: CircleDashed, color: 'text-indigo-700' },
+    fer: { icon: FlaskConical, color: 'text-red-500' },
+    zinc: { icon: FlaskConical, color: 'text-indigo-500' },
+    cuivre: { icon: FlaskConical, color: 'text-amber-600' },
+    manganese: { icon: FlaskConical, color: 'text-purple-500' },
+    selenium: { icon: FlaskConical, color: 'text-indigo-600' },
+    iode: { icon: FlaskConical, color: 'text-violet-500' },
+    chrome: { icon: FlaskConical, color: 'text-gray-600' },
+    molybdene: { icon: FlaskConical, color: 'text-gray-700' },
     default: { icon: CircleDashed, color: 'text-gray-400' },
   }
 };

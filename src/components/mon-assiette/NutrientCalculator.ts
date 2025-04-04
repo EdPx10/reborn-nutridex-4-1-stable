@@ -14,9 +14,38 @@ export const calculateTotalNutrients = (items: PlateItem[]) => {
       omega3: 0,
       omega6: 0
     },
-    vitamines: {} as { [key: string]: number },
-    mineraux: {} as { [key: string]: number },
-    oligoelements: {} as { [key: string]: number }
+    vitamines: {
+      vitamineA: 0,
+      vitamineD: 0,
+      vitamineE: 0,
+      vitamineK1: 0,
+      vitamineC: 0,
+      vitamineB1: 0,
+      vitamineB2: 0,
+      vitamineB3: 0,
+      vitamineB5: 0,
+      vitamineB6: 0,
+      vitamineB8: 0,
+      vitamineB9: 0,
+      vitamineB12: 0
+    },
+    mineraux: {
+      calcium: 0,
+      magnesium: 0,
+      phosphore: 0,
+      potassium: 0,
+      sodium: 0
+    },
+    oligoelements: {
+      fer: 0,
+      zinc: 0,
+      cuivre: 0,
+      manganese: 0,
+      selenium: 0,
+      iode: 0,
+      chrome: 0,
+      molybdene: 0
+    }
   };
   
   const totals = items.reduce((total, item) => {
@@ -28,6 +57,7 @@ export const calculateTotalNutrients = (items: PlateItem[]) => {
     // Macronutriments de base
     total.glucides += (food.nutrients.glucides || 0) * conversionFactor;
     total.proteines += (food.nutrients.proteines || 0) * conversionFactor;
+    total.lipides += (food.nutrients.lipides || 0) * conversionFactor;
     total.fibres += (food.nutrients.fibres || 0) * conversionFactor;
     
     // Lipides détaillés
@@ -45,32 +75,29 @@ export const calculateTotalNutrients = (items: PlateItem[]) => {
     
     // Vitamines
     if (food.nutrients.vitamines) {
-      Object.entries(food.nutrients.vitamines).forEach(([key, value]) => {
-        if (!total.vitamines[key]) {
-          total.vitamines[key] = 0;
+      for (const [key, value] of Object.entries(food.nutrients.vitamines)) {
+        if (key in total.vitamines && value !== undefined) {
+          (total.vitamines as any)[key] += value * conversionFactor;
         }
-        total.vitamines[key] += value * conversionFactor;
-      });
+      }
     }
     
     // Minéraux
     if (food.nutrients.mineraux) {
-      Object.entries(food.nutrients.mineraux).forEach(([key, value]) => {
-        if (!total.mineraux[key]) {
-          total.mineraux[key] = 0;
+      for (const [key, value] of Object.entries(food.nutrients.mineraux)) {
+        if (key in total.mineraux && value !== undefined) {
+          (total.mineraux as any)[key] += value * conversionFactor;
         }
-        total.mineraux[key] += value * conversionFactor;
-      });
+      }
     }
     
     // Oligo-éléments
     if (food.nutrients.oligoelements) {
-      Object.entries(food.nutrients.oligoelements).forEach(([key, value]) => {
-        if (!total.oligoelements[key]) {
-          total.oligoelements[key] = 0;
+      for (const [key, value] of Object.entries(food.nutrients.oligoelements)) {
+        if (key in total.oligoelements && value !== undefined) {
+          (total.oligoelements as any)[key] += value * conversionFactor;
         }
-        total.oligoelements[key] += value * conversionFactor;
-      });
+      }
     }
     
     return total;
@@ -78,11 +105,6 @@ export const calculateTotalNutrients = (items: PlateItem[]) => {
 
   // Calculer les AGP comme Oméga-3 + Oméga-6
   totals.lipids.polyUnsaturated = totals.lipids.omega3 + totals.lipids.omega6;
-  
-  // Calculer les lipides totaux comme somme des composants
-  totals.lipides = totals.lipids.saturated + 
-                   totals.lipids.monoUnsaturated + 
-                   totals.lipids.polyUnsaturated;
   
   return totals;
 };

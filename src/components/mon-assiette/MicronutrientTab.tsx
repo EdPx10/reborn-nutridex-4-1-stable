@@ -2,7 +2,15 @@
 import React from 'react';
 import Accordion from './Accordion';
 import MicroNutrientProgress from './MicroNutrientProgress';
-import { getNutrientIcon } from '@/components/ui/NutrientIcons';
+
+// Helper function to format vitamin names
+const formatVitaminName = (key: string): string => {
+  if (key.startsWith('vitamine')) {
+    const letter = key.replace('vitamine', '');
+    return `Vitamine ${letter.toUpperCase()}`;
+  }
+  return key.charAt(0).toUpperCase() + key.slice(1);
+};
 
 interface MicronutrientTabProps {
   totalNutrients: {
@@ -19,13 +27,13 @@ interface MicronutrientTabProps {
   activeProfile: {
     goals: {
       vitamines: {
-        [key: string]: { goal: number; unit: string };
+        [key: string]: { goal: number; unit: string; current: number };
       };
       mineraux: {
-        [key: string]: { goal: number; unit: string };
+        [key: string]: { goal: number; unit: string; current: number };
       };
       oligoelements?: {
-        [key: string]: { goal: number; unit: string };
+        [key: string]: { goal: number; unit: string; current: number };
       };
     };
   };
@@ -39,20 +47,20 @@ export const MicronutrientTab: React.FC<MicronutrientTabProps> = ({
     <div className="space-y-4">
       <Accordion title="Vitamines" defaultOpen={true}>
         <div className="space-y-6 pt-2">
-          {Object.entries(totalNutrients.vitamines).map(([key, value]) => {
-            const vitaminGoal = activeProfile.goals.vitamines[key];
-            if (!vitaminGoal) return null;
+          {Object.entries(activeProfile.goals.vitamines).map(([key, value]) => {
+            // Only show if there's a value or it's in the totalNutrients
+            const currentValue = totalNutrients.vitamines[key] ?? 0;
             
             return (
-              <div key={key} className="flex items-center gap-2">
-                {getNutrientIcon('vitamines', key, 16)}
-                <MicroNutrientProgress
-                  label={`Vitamine ${key.toUpperCase()}`}
-                  current={value}
-                  goal={vitaminGoal.goal}
-                  unit={vitaminGoal.unit}
-                />
-              </div>
+              <MicroNutrientProgress
+                key={key}
+                label={formatVitaminName(key)}
+                current={currentValue}
+                goal={value.goal}
+                unit={value.unit}
+                category="vitamines"
+                nutrientKey={key}
+              />
             );
           })}
         </div>
@@ -60,45 +68,40 @@ export const MicronutrientTab: React.FC<MicronutrientTabProps> = ({
       
       <Accordion title="Minéraux">
         <div className="space-y-6 pt-2">
-          {Object.entries(totalNutrients.mineraux).map(([key, value]) => {
-            const mineralGoal = activeProfile.goals.mineraux[key];
-            if (!mineralGoal) return null;
+          {Object.entries(activeProfile.goals.mineraux).map(([key, value]) => {
+            const currentValue = totalNutrients.mineraux[key] ?? 0;
             
             return (
-              <div key={key} className="flex items-center gap-2">
-                {getNutrientIcon('mineraux', key, 16)}
-                <MicroNutrientProgress
-                  key={key}
-                  label={key.charAt(0).toUpperCase() + key.slice(1)}
-                  current={value}
-                  goal={mineralGoal.goal}
-                  unit={mineralGoal.unit}
-                />
-              </div>
+              <MicroNutrientProgress
+                key={key}
+                label={key.charAt(0).toUpperCase() + key.slice(1)}
+                current={currentValue}
+                goal={value.goal}
+                unit={value.unit}
+                category="mineraux"
+                nutrientKey={key}
+              />
             );
           })}
         </div>
       </Accordion>
       
       <Accordion title="Oligo-éléments">
-        {totalNutrients.oligoelements && activeProfile.goals.oligoelements && 
-         Object.keys(totalNutrients.oligoelements).length > 0 ? (
+        {activeProfile.goals.oligoelements && Object.keys(activeProfile.goals.oligoelements).length > 0 ? (
           <div className="space-y-6 pt-2">
-            {Object.entries(totalNutrients.oligoelements).map(([key, value]) => {
-              const oligoGoal = activeProfile.goals.oligoelements?.[key];
-              if (!oligoGoal) return null;
+            {Object.entries(activeProfile.goals.oligoelements).map(([key, value]) => {
+              const currentValue = totalNutrients.oligoelements?.[key] ?? 0;
               
               return (
-                <div key={key} className="flex items-center gap-2">
-                  {getNutrientIcon('oligoelements', key, 16)}
-                  <MicroNutrientProgress
-                    key={key}
-                    label={key.charAt(0).toUpperCase() + key.slice(1)}
-                    current={value}
-                    goal={oligoGoal.goal}
-                    unit={oligoGoal.unit}
-                  />
-                </div>
+                <MicroNutrientProgress
+                  key={key}
+                  label={key.charAt(0).toUpperCase() + key.slice(1)}
+                  current={currentValue}
+                  goal={value.goal}
+                  unit={value.unit}
+                  category="oligoelements"
+                  nutrientKey={key}
+                />
               );
             })}
           </div>
