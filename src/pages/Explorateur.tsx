@@ -13,13 +13,28 @@ const Explorateur: React.FC = () => {
   const [selectedSeason, setSelectedSeason] = useState<string | undefined>(undefined);
   const [foods, setFoods] = useState<Food[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    // Reset foods array when filters change to prevent stale data
-    const filtered = getFilteredFoods(searchTerm, selectedCategory, selectedBenefit, selectedSeason);
-    setFoods(filtered);
-    // Console log to debug
-    console.log(`Search term: "${searchTerm}", found ${filtered.length} foods`);
+    // Définir une fonction asynchrone pour charger les données
+    const loadFoods = async () => {
+      setLoading(true);
+      try {
+        // Utiliser la fonction asynchrone getFilteredFoods
+        const filtered = await getFilteredFoods(searchTerm, selectedCategory, selectedBenefit, selectedSeason);
+        setFoods(filtered);
+        // Console log pour déboguer
+        console.log(`Search term: "${searchTerm}", found ${filtered.length} foods`);
+      } catch (error) {
+        console.error("Erreur lors du chargement des aliments:", error);
+        setFoods([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Charger les aliments
+    loadFoods();
   }, [searchTerm, selectedCategory, selectedBenefit, selectedSeason]);
 
   const handleSearch = (term: string) => {
@@ -43,7 +58,7 @@ const Explorateur: React.FC = () => {
   };
 
   const toggleSeason = (seasonId: string) => {
-    // Clear previous season selection completely before setting new one
+    // Effacer complètement la sélection précédente de saison avant d'en définir une nouvelle
     if (selectedSeason === seasonId) {
       setSelectedSeason(undefined);
     } else {
@@ -81,7 +96,13 @@ const Explorateur: React.FC = () => {
         toggleFilters={toggleFilters}
       />
       
-      <FoodGrid foods={foods} />
+      {loading ? (
+        <div className="flex justify-center my-10">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-nutri-green"></div>
+        </div>
+      ) : (
+        <FoodGrid foods={foods} />
+      )}
     </div>
   );
 };

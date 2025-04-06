@@ -1,41 +1,34 @@
-import { foods } from './index';
 
-export const getFilteredFoods = (
+import { Food } from '@/types';
+import { getFoods } from './index';
+import { fetchFoodById, searchFoods } from '@/services/foodService';
+
+// Fonction pour filtrer les aliments avec les critères donnés
+export const getFilteredFoods = async (
   search: string = '',
   category?: string,
   benefit?: string,
   season?: string
-) => {
-  let filteredFoods = [...foods];
-  
-  if (search && search.trim() !== '') {
-    const normalizedSearch = search.trim().toLowerCase();
-    filteredFoods = filteredFoods.filter(food => 
-      food.name.toLowerCase().startsWith(normalizedSearch)
-    );
+): Promise<Food[]> => {
+  try {
+    // Utiliser la fonction de recherche de Supabase
+    const filteredFoods = await searchFoods(search, category, benefit, season);
+    
+    console.log(`Search: "${search}" - Found ${filteredFoods.length} matching foods`);
+    
+    return filteredFoods;
+  } catch (error) {
+    console.error('Erreur lors du filtrage des aliments:', error);
+    return [];
   }
-  
-  if (category) {
-    filteredFoods = filteredFoods.filter(food => food.category === category);
-  }
-  
-  if (benefit) {
-    filteredFoods = filteredFoods.filter(food => 
-      food.healthBenefits.includes(benefit as any)
-    );
-  }
-  
-  if (season) {
-    filteredFoods = filteredFoods.filter(food => 
-      food.seasons && food.seasons.includes(season as any)
-    );
-  }
-  
-  console.log(`Search: "${search}" - Found ${filteredFoods.length} matching foods`);
-  
-  return filteredFoods;
 };
 
-export const getFoodById = (id: string) => {
-  return foods.find(food => food.id === id);
+// Fonction pour obtenir un aliment par son ID
+export const getFoodById = async (id: string): Promise<Food | null> => {
+  try {
+    return await fetchFoodById(id);
+  } catch (error) {
+    console.error(`Erreur lors de la récupération de l'aliment ${id}:`, error);
+    return null;
+  }
 };

@@ -13,13 +13,34 @@ import FoodSeasons from '@/components/ficheAliment/FoodSeasons';
 const FicheAliment: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [food, setFood] = useState<Food | null>(null);
+  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    if (id) {
-      const foundFood = getFoodById(id);
-      setFood(foundFood || null);
-    }
+    const loadFood = async () => {
+      setLoading(true);
+      if (id) {
+        try {
+          const foundFood = await getFoodById(id);
+          setFood(foundFood);
+        } catch (error) {
+          console.error("Erreur lors du chargement de l'aliment:", error);
+          setFood(null);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    
+    loadFood();
   }, [id]);
+  
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-nutri-green"></div>
+      </div>
+    );
+  }
   
   if (!food) {
     return (
