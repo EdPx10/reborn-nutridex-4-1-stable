@@ -20,13 +20,22 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, searchTerm }) => {
 
   // Update search results when search term changes
   useEffect(() => {
-    if (searchTerm.length > 0) {
-      const results = getFilteredFoods(searchTerm).slice(0, 8); // Limit to 8 results
-      setSearchResults(results);
-      setShowSearchResults(true); // Always show results container when search term exists
-    } else {
-      setShowSearchResults(false);
-    }
+    const fetchResults = async () => {
+      if (searchTerm.length > 0) {
+        try {
+          const results = await getFilteredFoods(searchTerm);
+          setSearchResults(results.slice(0, 8)); // Now slice the actual array
+          setShowSearchResults(true);
+        } catch (error) {
+          console.error("Error fetching search results:", error);
+          setSearchResults([]);
+        }
+      } else {
+        setShowSearchResults(false);
+      }
+    };
+
+    fetchResults();
   }, [searchTerm]);
 
   const handleAddToPlate = (food: Food, e: React.MouseEvent) => {

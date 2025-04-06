@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Search, Trash2, Plus } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
@@ -26,15 +27,24 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   const [quantityDialogOpen, setQuantityDialogOpen] = useState(false);
 
   useEffect(() => {
-    if (searchTerm.trim().length > 0) {
-      const results = getFilteredFoods(searchTerm.trim()).slice(0, 8);
-      console.log(`Search term: "${searchTerm}" - Found ${results.length} foods`);
-      setSearchResults(results);
-      setShowSearchResults(true);
-    } else {
-      setShowSearchResults(false);
-      setSearchResults([]);
-    }
+    const fetchResults = async () => {
+      if (searchTerm.trim().length > 0) {
+        try {
+          const results = await getFilteredFoods(searchTerm.trim());
+          setSearchResults(results.slice(0, 8));
+          console.log(`Search term: "${searchTerm}" - Found ${results.length} foods`);
+          setShowSearchResults(true);
+        } catch (error) {
+          console.error("Error fetching search results:", error);
+          setSearchResults([]);
+        }
+      } else {
+        setShowSearchResults(false);
+        setSearchResults([]);
+      }
+    };
+
+    fetchResults();
   }, [searchTerm]);
 
   const handleAddToPlate = (food: Food, e: React.MouseEvent) => {

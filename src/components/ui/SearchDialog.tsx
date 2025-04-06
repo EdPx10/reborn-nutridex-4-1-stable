@@ -22,11 +22,21 @@ const SearchDialog: React.FC<SearchDialogProps> = ({ isOpen, onClose }) => {
   
   // Update search results when search term changes
   useEffect(() => {
-    if (searchTerm.length > 0) {
-      setSearchResults(getFilteredFoods(searchTerm).slice(0, 10));
-    } else {
-      setSearchResults([]);
-    }
+    const fetchResults = async () => {
+      if (searchTerm.length > 0) {
+        try {
+          const results = await getFilteredFoods(searchTerm);
+          setSearchResults(results.slice(0, 10));
+        } catch (error) {
+          console.error("Error fetching search results:", error);
+          setSearchResults([]);
+        }
+      } else {
+        setSearchResults([]);
+      }
+    };
+
+    fetchResults();
   }, [searchTerm]);
 
   const handleAddToPlate = (food: Food, e: React.MouseEvent) => {
