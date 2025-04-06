@@ -16,16 +16,17 @@ interface NutrientData {
 
 // Fonction pour transformer les données Supabase en format Food
 const mapSupabaseDataToFood = async (foodData: any): Promise<Food> => {
-  // Récupérer les nutriments liés à cet aliment
+  // Récupérer uniquement les nutriments pertinents pour cet aliment
   const { data: nutrientsData } = await supabase
     .from('food_nutrients')
     .select(`
       *,
       nutrient:nutrients(*)
     `)
-    .eq('food_id', foodData.id);
+    .eq('food_id', foodData.id)
+    .in('nutrient.slug', ['proteines', 'glucides', 'lipides', 'fibres']);
 
-  // Organiser les nutriments par catégorie
+  // Initialiser les nutriments avec des valeurs par défaut
   const nutrients: any = {
     glucides: 0,
     proteines: 0,
@@ -33,43 +34,28 @@ const mapSupabaseDataToFood = async (foodData: any): Promise<Food> => {
     fibres: 0
   };
 
-  // Vitamines, minéraux et oligoéléments
-  const vitamines: Record<string, number> = {};
-  const mineraux: Record<string, number> = {};
-  const oligoelements: Record<string, number> = {};
-
+  // Assigner les valeurs des nutriments si disponibles
   if (nutrientsData) {
     nutrientsData.forEach((item: NutrientData) => {
       const nutrientSlug = item.nutrient.slug;
       const value = item.value;
 
-      // Assigner les valeurs en fonction des slugs
-      if (nutrientSlug === 'glucides') nutrients.glucides = value;
-      else if (nutrientSlug === 'proteines') nutrients.proteines = value;
-      else if (nutrientSlug === 'lipides') nutrients.lipides = value;
-      else if (nutrientSlug === 'fibres') nutrients.fibres = value;
-      else {
-        // Catégoriser par type de nutriment
-        const category = item.nutrient.category;
-        if (category === 'vitamine') {
-          // Conversion des clés de vitamines au format attendu (vitamineC, vitamineB12, etc.)
-          const vitamineName = nutrientSlug.startsWith('vitamine') 
-            ? nutrientSlug 
-            : `vitamine${nutrientSlug.toUpperCase()}`;
-          vitamines[vitamineName] = value;
-        } else if (category === 'mineral') {
-          mineraux[nutrientSlug] = value;
-        } else if (category === 'oligoelement') {
-          oligoelements[nutrientSlug] = value;
-        }
+      switch (nutrientSlug) {
+        case 'proteines':
+          nutrients.proteines = value;
+          break;
+        case 'glucides':
+          nutrients.glucides = value;
+          break;
+        case 'lipides':
+          nutrients.lipides = value;
+          break;
+        case 'fibres':
+          nutrients.fibres = value;
+          break;
       }
     });
   }
-
-  // Ajouter les catégories si des valeurs existent
-  if (Object.keys(vitamines).length > 0) nutrients.vitamines = vitamines;
-  if (Object.keys(mineraux).length > 0) nutrients.mineraux = mineraux;
-  if (Object.keys(oligoelements).length > 0) nutrients.oligoelements = oligoelements;
 
   // Convertir les données de l'aliment au format attendu
   return {
@@ -140,7 +126,7 @@ export const searchFoods = async (
     let query = supabase.from('foods').select('*');
     
     if (searchTerm) {
-      query = query.ilike('name', `${searchTerm}%`);
+      query = query.ilike('name', `%${searchTerm}%`);
     }
     
     if (category) {
