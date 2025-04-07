@@ -14,19 +14,31 @@ interface NutrientData {
   };
 }
 
-// Fonction pour transformer les données Supabase en format Food
+// Map English nutrient slugs to French property names
+const NUTRIENT_SLUG_MAP = {
+  'proteins': 'proteines',
+  'carbohydrates': 'glucides',
+  'fats': 'lipides',
+  'fiber': 'fibres'
+};
+
+// Function to map Supabase data to Food format
 const mapSupabaseDataToFood = async (foodData: any): Promise<Food> => {
-  // Récupérer uniquement les nutriments pertinents pour cet aliment
-  const { data: nutrientsData } = await supabase
+  // Fetch relevant nutrients for this food
+  const { data: nutrientsData, error } = await supabase
     .from('food_nutrients')
     .select(`
       *,
       nutrient:nutrients(*)
     `)
     .eq('food_id', foodData.id)
-    .in('nutrient.slug', ['proteines', 'glucides', 'lipides', 'fibres']);
+    .in('nutrient.slug', ['proteins', 'carbohydrates', 'fats', 'fiber']);
 
-  // Initialiser les nutriments avec des valeurs par défaut
+  if (error) {
+    console.error('Error fetching nutrients:', error);
+  }
+
+  // Initialize nutrients with default values
   const nutrients: any = {
     glucides: 0,
     proteines: 0,
@@ -34,30 +46,21 @@ const mapSupabaseDataToFood = async (foodData: any): Promise<Food> => {
     fibres: 0
   };
 
-  // Assigner les valeurs des nutriments si disponibles
-  if (nutrientsData) {
+  // Map nutrients if available
+  if (nutrientsData && nutrientsData.length > 0) {
     nutrientsData.forEach((item: NutrientData) => {
       const nutrientSlug = item.nutrient.slug;
       const value = item.value;
 
-      switch (nutrientSlug) {
-        case 'proteines':
-          nutrients.proteines = value;
-          break;
-        case 'glucides':
-          nutrients.glucides = value;
-          break;
-        case 'lipides':
-          nutrients.lipides = value;
-          break;
-        case 'fibres':
-          nutrients.fibres = value;
-          break;
+      // Map English slug to French property name
+      if (nutrientSlug in NUTRIENT_SLUG_MAP) {
+        const frenchProperty = NUTRIENT_SLUG_MAP[nutrientSlug as keyof typeof NUTRIENT_SLUG_MAP];
+        nutrients[frenchProperty] = value;
       }
     });
   }
 
-  // Convertir les données de l'aliment au format attendu
+  // Convert food data to expected format
   return {
     id: foodData.id,
     name: foodData.name,
@@ -73,7 +76,7 @@ const mapSupabaseDataToFood = async (foodData: any): Promise<Food> => {
   };
 };
 
-// Récupérer tous les aliments depuis Supabase
+// Fetch all foods from Supabase
 export const fetchAllFoods = async (): Promise<Food[]> => {
   try {
     const { data, error } = await supabase
@@ -81,20 +84,22 @@ export const fetchAllFoods = async (): Promise<Food[]> => {
       .select('*');
 
     if (error) {
-      console.error('Erreur lors de la récupération des aliments:', error);
+      console.error('Error fetching foods:', error);
       return [];
     }
 
-    // Transformer chaque aliment au format Food
+    console.log(`Retrieved ${data.length} foods from database`);
+    
+    // Transform each food to Food format
     const foodsPromises = data.map(mapSupabaseDataToFood);
     return Promise.all(foodsPromises);
   } catch (error) {
-    console.error('Erreur lors de la récupération des aliments:', error);
+    console.error('Error fetching foods:', error);
     return [];
   }
 };
 
-// Récupérer un aliment par son ID
+// Fetch a food by ID
 export const fetchFoodById = async (id: string): Promise<Food | null> => {
   try {
     const { data, error } = await supabase
@@ -104,18 +109,18 @@ export const fetchFoodById = async (id: string): Promise<Food | null> => {
       .single();
 
     if (error || !data) {
-      console.error('Erreur lors de la récupération de l\'aliment:', error);
+      console.error('Error fetching food:', error);
       return null;
     }
 
     return mapSupabaseDataToFood(data);
   } catch (error) {
-    console.error('Erreur lors de la récupération de l\'aliment:', error);
+    console.error('Error fetching food:', error);
     return null;
   }
 };
 
-// Recherche d'aliments avec filtres
+// Search foods with filters
 export const searchFoods = async (
   searchTerm: string = '',
   category?: string,
@@ -144,15 +149,17 @@ export const searchFoods = async (
     const { data, error } = await query;
     
     if (error) {
-      console.error('Erreur lors de la recherche des aliments:', error);
+      console.error('Error searching foods:', error);
       return [];
     }
     
-    // Transformer chaque aliment au format Food
+    console.log(`Search returned ${data.length} foods`);
+    
+    // Transform each food to Food format
     const foodsPromises = data.map(mapSupabaseDataToFood);
     return Promise.all(foodsPromises);
   } catch (error) {
-    console.error('Erreur lors de la recherche des aliments:', error);
+    console.error('Error searching foods:', error);
     return [];
   }
 };

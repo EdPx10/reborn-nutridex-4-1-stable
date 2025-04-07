@@ -24,7 +24,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, searchTerm }) => {
       if (searchTerm.length > 0) {
         try {
           const results = await getFilteredFoods(searchTerm);
-          setSearchResults(results.slice(0, 8)); // Now slice the actual array
+          setSearchResults(results.slice(0, 8)); // Now we can safely slice the results
           setShowSearchResults(true);
         } catch (error) {
           console.error("Error fetching search results:", error);

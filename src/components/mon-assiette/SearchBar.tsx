@@ -31,7 +31,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       if (searchTerm.trim().length > 0) {
         try {
           const results = await getFilteredFoods(searchTerm.trim());
-          setSearchResults(results.slice(0, 8));
+          setSearchResults(results.slice(0, 8)); // Now we can safely slice the results
           console.log(`Search term: "${searchTerm}" - Found ${results.length} foods`);
           setShowSearchResults(true);
         } catch (error) {
