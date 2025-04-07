@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { FoodGrid } from '@/components/ui/FoodGrid';
+import { FoodGrid } from '@/components/explorateur/FoodGrid';
 import { Food } from '@/types';
 import { fetchAllFoods } from '@/services/foodService';
 import { Card, CardContent } from '@/components/ui/card';

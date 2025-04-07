@@ -24,20 +24,26 @@ const NUTRIENT_SLUG_MAP = {
 
 // Function to map Supabase data to Food format
 const mapSupabaseDataToFood = async (foodData: any): Promise<Food> => {
+  console.log(`Mapping food data for: ${foodData.name}`);
+  
   // Fetch relevant nutrients for this food
   const { data: nutrientsData, error } = await supabase
     .from('food_nutrients')
     .select(`
-      *,
-      nutrient:nutrients(*)
+      id,
+      food_id,
+      nutrient_id,
+      value,
+      nutrient:nutrients(id, name, slug, category, unit)
     `)
-    .eq('food_id', foodData.id)
-    .in('nutrient.slug', ['proteins', 'carbohydrates', 'fats', 'fiber']);
+    .eq('food_id', foodData.id);
 
   if (error) {
     console.error('Error fetching nutrients:', error);
   }
 
+  console.log(`Found ${nutrientsData?.length || 0} nutrients for food ${foodData.name}`);
+  
   // Initialize nutrients with default values
   const nutrients: any = {
     glucides: 0,
@@ -51,11 +57,14 @@ const mapSupabaseDataToFood = async (foodData: any): Promise<Food> => {
     nutrientsData.forEach((item: NutrientData) => {
       const nutrientSlug = item.nutrient.slug;
       const value = item.value;
+      
+      console.log(`Nutrient: ${nutrientSlug}, Value: ${value}`);
 
       // Map English slug to French property name
       if (nutrientSlug in NUTRIENT_SLUG_MAP) {
         const frenchProperty = NUTRIENT_SLUG_MAP[nutrientSlug as keyof typeof NUTRIENT_SLUG_MAP];
         nutrients[frenchProperty] = value;
+        console.log(`Mapped ${nutrientSlug} to ${frenchProperty}: ${value}`);
       }
     });
   }
