@@ -6,6 +6,7 @@ export const proteins: Food[] = [
     id: 'saumon',
     name: 'Saumon',
     category: 'poisson',
+    image: '/lovable-uploads/7da7bf93-0695-4e22-ba4a-279697f2d856.png',
     nutrients: {
       glucides: 0,
       proteines: 20,
