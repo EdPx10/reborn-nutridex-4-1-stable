@@ -1,26 +1,55 @@
 
 import React, { useState, useEffect } from 'react';
-import { getFilteredFoods } from '@/data/foods';
 import { Food } from '@/types';
 import { SearchBar } from '@/components/explorateur/SearchBar';
 import { FiltersSection } from '@/components/explorateur/FiltersSection';
 import { FoodGrid } from '@/components/explorateur/FoodGrid';
+import { useAliments } from '@/hooks/useAliments';
+import { Loader2 } from 'lucide-react';
 
 const Explorateur: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>(undefined);
   const [selectedBenefit, setSelectedBenefit] = useState<string | undefined>(undefined);
   const [selectedSeason, setSelectedSeason] = useState<string | undefined>(undefined);
-  const [foods, setFoods] = useState<Food[]>([]);
+  const [filteredFoods, setFilteredFoods] = useState<Food[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   
+  const { data: foods = [], isLoading } = useAliments();
+  
   useEffect(() => {
-    // Reset foods array when filters change to prevent stale data
-    const filtered = getFilteredFoods(searchTerm, selectedCategory, selectedBenefit, selectedSeason);
-    setFoods(filtered);
-    // Console log to debug
+    let filtered = [...foods];
+
+    // Filter by search term
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase().trim();
+      filtered = filtered.filter(food => 
+        food.name.toLowerCase().startsWith(term)
+      );
+    }
+
+    // Filter by category
+    if (selectedCategory) {
+      filtered = filtered.filter(food => food.category === selectedCategory);
+    }
+
+    // Filter by health benefit
+    if (selectedBenefit) {
+      filtered = filtered.filter(food => 
+        food.healthBenefits.includes(selectedBenefit as any)
+      );
+    }
+
+    // Filter by season
+    if (selectedSeason) {
+      filtered = filtered.filter(food => 
+        food.seasons && food.seasons.includes(selectedSeason as any)
+      );
+    }
+
+    setFilteredFoods(filtered);
     console.log(`Search term: "${searchTerm}", found ${filtered.length} foods`);
-  }, [searchTerm, selectedCategory, selectedBenefit, selectedSeason]);
+  }, [searchTerm, selectedCategory, selectedBenefit, selectedSeason, foods]);
 
   const handleSearch = (term: string) => {
     setSearchTerm(term);
@@ -43,7 +72,6 @@ const Explorateur: React.FC = () => {
   };
 
   const toggleSeason = (seasonId: string) => {
-    // Clear previous season selection completely before setting new one
     if (selectedSeason === seasonId) {
       setSelectedSeason(undefined);
     } else {
@@ -81,7 +109,13 @@ const Explorateur: React.FC = () => {
         toggleFilters={toggleFilters}
       />
       
-      <FoodGrid foods={foods} />
+      {isLoading ? (
+        <div className="flex justify-center items-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-nutri-green" />
+        </div>
+      ) : (
+        <FoodGrid foods={filteredFoods} />
+      )}
     </div>
   );
 };

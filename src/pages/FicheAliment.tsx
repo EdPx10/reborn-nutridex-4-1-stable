@@ -1,25 +1,25 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getFoodById } from '@/data/foods';
-import { Food } from '@/types';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Loader2 } from 'lucide-react';
 import FoodHeader from '@/components/ficheAliment/FoodHeader';
 import MacroNutrients from '@/components/ficheAliment/MacroNutrients';
 import MicroNutrients from '@/components/ficheAliment/MicroNutrients';
 import HealthBenefits from '@/components/ficheAliment/HealthBenefits';
 import FoodSeasons from '@/components/ficheAliment/FoodSeasons';
+import { useAliment } from '@/hooks/useAliments';
 
 const FicheAliment: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [food, setFood] = useState<Food | null>(null);
+  const { data: food, isLoading } = useAliment(id!);
   
-  useEffect(() => {
-    if (id) {
-      const foundFood = getFoodById(id);
-      setFood(foundFood || null);
-    }
-  }, [id]);
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-nutri-green" />
+      </div>
+    );
+  }
   
   if (!food) {
     return (
@@ -43,7 +43,6 @@ const FicheAliment: React.FC = () => {
         <FoodHeader food={food} />
         
         <div className="p-6 pt-0">
-          {/* Nutriments */}
           <div className="mt-6">
             <h2 className="text-2xl font-semibold mb-4">Composition nutritionnelle</h2>
             <div className="space-y-6">
