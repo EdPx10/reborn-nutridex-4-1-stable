@@ -1,7 +1,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Food } from '@/types';
+import { Food, FoodCategory } from '@/types';
 
 type AlimentFromDB = {
   id: string;
@@ -22,6 +22,14 @@ type AlimentFromDB = {
   magnesium_mg: number;
   fer_mg: number;
   potassium_mg: number;
+};
+
+// Cette fonction vérifie si une catégorie est valide selon notre type FoodCategory
+const isFoodCategory = (category: string): category is FoodCategory => {
+  const validCategories: FoodCategory[] = [
+    'fruit', 'legume', 'poisson', 'viande', 'cereales', 'noix', 'legumineuse'
+  ];
+  return validCategories.includes(category as FoodCategory);
 };
 
 const mapAlimentToFood = async (aliment: AlimentFromDB): Promise<Food> => {
@@ -47,10 +55,17 @@ const mapAlimentToFood = async (aliment: AlimentFromDB): Promise<Food> => {
   const healthBenefits = benefitsData?.map(b => (b.bienfaits as any).nom) || [];
   const seasons = seasonsData?.map(s => (s.saisons as any).nom) || [];
 
+  // Vérifier si la catégorie est valide, sinon utiliser 'autres' comme fallback
+  let categoryName = categoryData?.nom || 'autres';
+  if (!isFoodCategory(categoryName)) {
+    console.warn(`La catégorie "${categoryName}" n'est pas reconnue, utilisation de "legume" par défaut`);
+    categoryName = 'legume'; // Catégorie par défaut
+  }
+
   return {
     id: aliment.id,
     name: aliment.nom,
-    category: categoryData?.nom || 'autres',
+    category: categoryName as FoodCategory,
     image: aliment.image_url || undefined,
     nutrients: {
       glucides: aliment.glucides,
